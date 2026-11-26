@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>补丁下载中心</title>
+<style>
+  :root {
+    --blue: #4a90e2;
+    --blue-dark: #3a7bc8;
+    --blue-light: #eaf3fd;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #2b2f36;
+    --sub: #8a9099;
+    --line: #eceff3;
+    --shadow: 0 2px 12px rgba(60,80,120,.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); padding-bottom: 40px;
+  }
+  /* 顶部导航 */
+  .topbar {
+    position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.96);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  }
+  .topbar .back {
+    font-size: 20px; cursor: pointer; color: var(--text); width: 24px; flex: 0 0 auto;
+    opacity: 0; pointer-events: none;
+  }
+  .topbar .back.show { opacity: 1; pointer-events: auto; }
+  .topbar .brand { font-size: 15px; font-weight: 700; flex: 1; display: flex; align-items: center; gap: 6px; }
+  .topbar .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); }
+  .topbar .nav { display: flex; gap: 16px; font-size: 13px; color: var(--sub); }
+  .topbar .nav a { color: var(--sub); text-decoration: none; cursor: pointer; }
+  .topbar .nav a:first-child { color: var(--text); font-weight: 600; }
+
+  .container { max-width: 720px; margin: 0 auto; padding: 22px 16px; }
+
+  /* 配置卡 */
+  .config {
+    background: var(--card); border-radius: 14px; padding: 18px; box-shadow: var(--shadow);
+    margin-bottom: 18px; border: 1px solid var(--line);
+  }
+  .config h3 { font-size: 15px; margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
+  .config .desc { font-size: 12px; color: var(--sub); margin-bottom: 14px; line-height: 1.6; }
+  .config .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .config .fld { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 5px; }
+  .config label { font-size: 11px; color: var(--sub); }
+  .config input {
+    border: 1px solid #dfe4ea; border-radius: 8px; padding: 9px 11px; font-size: 13px;
+    outline: none; color: var(--text); background: #fbfcfe; width: 100%;
+  }
+  .config input:focus { border-color: var(--blue); }
+  .config .actions { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .btn {
+    border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer; background: var(--blue); color: #fff; transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-sm { padding: 7px 14px; font-size: 12px; }
+  .btn-ghost { background: #f0f3f7; color: var(--text); }
+  .cfg-msg { font-size: 12px; color: var(--sub); }
+  .cfg-msg.err { color: #e35b5b; }
+
+  /* 头部标题 */
+  .hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .hero .sub { font-size: 12px; color: var(--sub); line-height: 1.7; }
+  .welcome {
+    margin: 16px 0; background: var(--blue-light); color: var(--blue-dark);
+    padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
+  }
+  .stats { display: flex; gap: 10px; margin-bottom: 18px; }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 7px 14px; font-size: 12px; color: var(--sub);
+  }
+  .stat b { color: var(--text); font-size: 14px; }
+
+  /* 分类卡片 */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .folder {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 16px 18px; cursor: pointer; box-shadow: var(--shadow);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .folder:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(60,80,120,.14); }
+  .folder .ico {
+    width: 52px; height: 52px; border-radius: 12px; background: #fff6e0;
+    display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 14px;
+  }
+  .folder .name { font-size: 15px; font-weight: 700; margin-bottom: 4px; word-break: break-all; }
+  .folder .cnt { font-size: 12px; color: var(--sub); }
+
+  /* 文件列表页 */
+  .crumb { font-size: 12px; color: var(--sub); margin-bottom: 10px; }
+  .crumb a { color: var(--blue); cursor: pointer; text-decoration: none; }
+  .page-title { font-size: 22px; font-weight: 800; margin-bottom: 16px; word-break: break-all; }
+  .filelist { display: flex; flex-direction: column; gap: 10px; }
+  .file {
+    display: flex; align-items: center; gap: 12px; background: var(--card);
+    border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow);
+  }
+  .file .zip {
+    width: 38px; height: 38px; flex: 0 0 auto; border-radius: 8px; background: var(--blue-light);
+    color: var(--blue); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  }
+  .file .info { flex: 1; min-width: 0; }
+  .file .fname { font-size: 14px; font-weight: 600; word-break: break-all; line-height: 1.4; }
+  .file .fmeta { font-size: 11px; color: var(--sub); margin-top: 3px; }
+  .file .dl {
+    flex: 0 0 auto; background: var(--blue); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+  }
+  .file .dl:hover { background: var(--blue-dark); }
+
+  .empty { text-align: center; color: var(--sub); padding: 50px 20px; font-size: 14px; }
+
+  /* 加载 / 错误 */
+  .state { text-align: center; padding: 60px 20px; color: var(--sub); font-size: 14px; }
+  .spin {
+    width: 26px; height: 26px; border: 3px solid var(--line); border-top-color: var(--blue);
+    border-radius: 50%; animation: r .8s linear infinite; margin: 0 auto 14px;
+  }
+  @keyframes r { to { transform: rotate(360deg); } }
+
+  /* 底部声明 */
+  .footer {
+    text-align: center; font-size: 11px; color: var(--sub); line-height: 1.9;
+    margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line);
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="back" id="backBtn">‹</div>
+  <div class="brand"><span class="dot"></span><span>补丁下载</span></div>
+  <div class="nav"><a id="navHome">首页</a><a id="navGuide">更新指南</a></div>
+</div>
+
+<div class="container">
+  <!-- 配置卡 -->
+  <div class="config" id="configCard">
+    <h3>⚙️ Gitee 仓库设置</h3>
+    <div class="desc">填写存放补丁的 Gitee 仓库（需设为公开），网页会自动读取里面的文件夹和文件，生成下载列表。配置只保存在你自己的浏览器里。</div>
+    <div class="row">
+      <div class="fld">
+        <label>用户名 / 所有者</label>
+        <input type="text" id="cfgOwner" placeholder="例如 yourname">
+      </div>
+      <div class="fld">
+        <label>仓库名</label>
+        <input type="text" id="cfgRepo" placeholder="例如 game-patches">
+      </div>
+      <div class="fld">
+        <label>分支</label>
+        <input type="text" id="cfgBranch" value="master" placeholder="master">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="saveBtn">保存并加载</button>
+      <button class="btn btn-ghost btn-sm" id="reloadBtn">重新加载</button>
+      <span class="cfg-msg" id="cfgMsg"></span>
+    </div>
+  </div>
+
+  <!-- 首页视图 -->
+  <div id="homeView">
+    <div class="hero">
+      <h1>补丁下载中心</h1>
+      <div class="sub" id="heroSub">客户端补丁 · 资源更新 · 热修复 统一下载与说明</div>
+    </div>
+    <div class="welcome">欢迎来到补丁下载中心，最新补丁见下方列表 ~</div>
+    <div class="stats">
+      <div class="stat">共 <b id="catCount">0</b> 个分类</div>
+      <div class="stat">共 <b id="patchCount">0</b> 个补丁</div>
+    </div>
+    <div class="grid" id="folderGrid"></div>
+    <div class="state" id="homeState"><div class="spin"></div>正在读取仓库…</div>
+  </div>
+
+  <!-- 分类视图 -->
+  <div id="detailView" class="hidden">
+    <div class="crumb"><a id="crumbHome">首页</a> <span id="crumbSep">›</span> <span id="crumbName"></span></div>
+    <div class="page-title" id="detailTitle"></div>
+    <div class="filelist" id="fileList"></div>
+  </div>
+
+  <!-- 更新指南视图 -->
+  <div id="guideView" class="hidden">
+    <div class="page-title">更新指南</div>
+    <div class="welcome" style="line-height:1.9">
+      1. 在首页点击对应作者 / 分类的文件夹卡片进入。<br>
+      2. 找到需要的补丁，点右下角「下载」按钮即可单独下载该文件。<br>
+      3. 下载的补丁请按说明放到游戏对应目录。
+    </div>
+    <div class="sub" style="font-size:12px;color:var(--sub);margin-top:16px;line-height:1.8">
+      补丁由玩家社区自建整理，仅用于分发与交流；游戏相关内容版权归官方所有。
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>本页面为玩家自建补丁下载与说明页面，仅用于补丁分发与交流。游戏相关内容版权归官方所有。</div>
+    <div>补丁下载中心</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const API = 'https://gitee.com/api/v5/repos';
+
+  let CFG = {};
+  let cache = {}; // 目录缓存 path -> items
+
+  function loadCfg() {
+    try {
+      const s = JSON.parse(localStorage.getItem('patch_site_cfg') || '{}');
+      $('cfgOwner').value = s.owner || '';
+      $('cfgRepo').value = s.repo || '';
+      $('cfgBranch').value = s.branch || 'master';
+      if (s.owner && s.repo) CFG = s;
+    } catch (e) {}
+  }
+  function saveCfg() {
+    CFG = {
+      owner: $('cfgOwner').value.trim(),
+      repo: $('cfgRepo').value.trim(),
+      branch: $('cfgBranch').value.trim() || 'master'
+    };
+    if (!CFG.owner || !CFG.repo) { setMsg('请填写用户名和仓库名', true); return false; }
+    localStorage.setItem('patch_site_cfg', JSON.stringify(CFG));
+    setMsg('已保存', false);
+    return true;
+  }
+  function setMsg(t, err) { $('cfgMsg').textContent = t; $('cfgMsg').className = 'cfg-msg' + (err ? ' err' : ''); }
+
+  async function api(path) {
+    const url = API + '/' + encodeURIComponent(CFG.owner) + '/' + encodeURIComponent(CFG.repo) +
+      '/contents/' + path.split('/').map(encodeURIComponent).join('/') +
+      '?ref=' + encodeURIComponent(CFG.branch) + '&t=' + Date.now();
+    const res = await fetch(url);
+    if (!res.ok) {
+      let msg = 'HTTP ' + res.status;
+      try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+      throw new Error(msg);
+    }
+    return res.json();
+  }
+
+  function show(view) {
+    ['homeView', 'detailView', 'guideView'].forEach(v => $(v).classList.add('hidden'));
+    $(view).classList.remove('hidden');
+    $('backBtn').classList.toggle('show', view === 'detailView' || view === 'guideView');
+    $('navHome').style.color = view === 'homeView' ? 'var(--text)' : '';
+    $('navHome').style.fontWeight = view === 'homeView' ? '600' : '';
+    window.scrollTo(0, 0);
+  }
+
+  async function loadHome() {
+    show('homeView');
+    $('homeState').classList.remove('hidden');
+    $('folderGrid').innerHTML = '';
+    $('homeState').innerHTML = '<div class="spin"></div>正在读取仓库…';
+    try {
+      const roots = await api('');
+      const dirs = roots.filter(x => x.type === 'dir').sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+      const files = roots.filter(x => x.type === 'file');
+      if (!dirs.length && !files.length) {
+        $('homeState').innerHTML = '仓库是空的，先往里面上传补丁文件吧';
+        return;
+      }
+      // 统计每个分类的文件数（含一层子目录）
+      const counts = await Promise.all(dirs.map(async d => {
+        try {
+          const items = await api(d.path);
+          cache[d.path] = items;
+          let n = 0;
+          for (const it of items) {
+            if (it.type === 'file') n++;
+            else if (it.type === 'dir') {
+              try { n += (await api(it.path)).filter(x => x.type === 'file').length; } catch (e) {}
+            }
+          }
+          return n;
+        } catch (e) { return 0; }
+      }));
+
+      dirs.forEach((d, i) => {
+        const el = document.createElement('div');
+        el.className = 'folder';
+        el.innerHTML =
+          '<div class="ico">📁</div>' +
+          '<div class="name">' + esc(d.name) + '</div>' +
+          '<div class="cnt">' + counts[i] + ' 个补丁</div>';
+        el.onclick = () => openDir(d.path, d.name);
+        $('folderGrid').appendChild(el);
+      });
+
+      // 根目录直接放的文件也做成一个"未分类"
+      if (files.length) {
+        cache[''] = roots;
+        const el = document.createElement('div');
+        el.className = 'folder';
+        el.innerHTML =
+          '<div class="ico">📁</div>' +
+          '<div class="name">未分类补丁</div>' +
+          '<div class="cnt">' + files.length + ' 个补丁</div>';
+        el.onclick = () => openDir('', '未分类补丁');
+        $('folderGrid').appendChild(el);
+      }
+
+      const total = counts.reduce((a, b) => a + b, 0) + files.length;
+      $('catCount').textContent = dirs.length + (files.length ? 1 : 0);
+      $('patchCount').textContent = total;
+      $('homeState').classList.add('hidden');
+    } catch (e) {
+      $('homeState').innerHTML =
+        '<div style="color:#e35b5b;margin-bottom:8px">读取失败：' + esc(e.message) + '</div>' +
+        '<div style="font-size:12px">检查仓库名、分支是否正确，仓库是否已设为公开</div>';
+    }
+  }
+
+  function ext(name) {
+    const i = name.lastIndexOf('.');
+    return i > 0 ? name.slice(i + 1).toUpperCase().slice(0, 4) : 'FILE';
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function fmtSize(b) {
+    if (!b && b !== 0) return '';
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+    return (b / 1048576).toFixed(1) + ' MB';
+  }
+
+  async function openDir(path, name) {
+    show('detailView');
+    $('crumbName').textContent = name;
+    $('detailTitle').textContent = name + '补丁下载';
+    $('fileList').innerHTML = '<div class="state"><div class="spin"></div>加载中…</div>';
+    try {
+      let items = cache[path];
+      if (!items) { items = await api(path); cache[path] = items; }
+      const files = items.filter(x => x.type === 'file')
+        .sort((a, b) => a.name.localeCompare(b.name, 'zh'));
+      if (!files.length) { $('fileList').innerHTML = '<div class="empty">这个文件夹里还没有补丁文件</div>'; return; }
+      $('fileList').innerHTML = '';
+      files.forEach(f => {
+        const raw = 'https://gitee.com/' + CFG.owner + '/' + CFG.repo +
+          '/raw/' + CFG.branch + '/' + f.path.split('/').map(encodeURIComponent).join('/');
+        const el = document.createElement('div');
+        el.className = 'file';
+        el.innerHTML =
+          '<div class="zip">' + esc(ext(f.name)) + '</div>' +
+          '<div class="info">' +
+            '<div class="fname">' + esc(f.name) + '</div>' +
+            '<div class="fmeta">' + fmtSize(f.size) + (f.size ? ' · ' : '') + '点击下载单独文件</div>' +
+          '</div>' +
+          '<a class="dl" href="' + esc(raw) + '" target="_blank" rel="noopener">下载</a>';
+        $('fileList').appendChild(el);
+      });
+    } catch (e) {
+      $('fileList').innerHTML = '<div class="state" style="color:#e35b5b">加载失败：' + esc(e.message) + '</div>';
+    }
+  }
+
+  // 事件
+  $('saveBtn').onclick = () => { if (saveCfg()) { cache = {}; loadHome(); } };
+  $('reloadBtn').onclick = () => {
+    if (!CFG.owner || !CFG.repo) { if (!saveCfg()) return; }
+    cache = {}; loadHome();
+  };
+  $('backBtn').onclick = () => loadHome();
+  $('navHome').onclick = () => loadHome();
+  $('crumbHome').onclick = () => loadHome();
+  $('navGuide').onclick = () => show('guideView');
+
+  loadCfg();
+  if (CFG.owner && CFG.repo) { cache = {}; loadHome(); }
+  else { $('homeState').innerHTML = '<div style="font-size:13px;line-height:1.8">请先在上方填写你的 Gitee 仓库信息并保存，<br>网页会自动生成补丁分类和下载列表。</div>'; }
+})();
+</script>
+</body>
+</html>
