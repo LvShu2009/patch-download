@@ -1,6 +1,4 @@
-// 补丁数据 —— 可用 editor.py 直接编辑
-// 字段：title 标题 / category 分类 / type 类型(client|resource|hotfix) / date 日期 / size 大小
-//       url 下载地址 / summary 一句话简介 / changes 改动明细数组
+// 补丁数据（搬运版）- source: github=自己的GitHub源 / friend=朋友仓库源
 const PATCHES = [
   {
     "title": "localmode",
@@ -8,12 +6,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-09-01",
     "size": "0.1 KB",
-    "url": "https://gitee.com/aonohana/300m-patch-files-2/releases/download/v1.0/localmode.zip",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/ACNZ%E7%9A%84%E8%A1%A5%E4%B8%81/localmode.zip",
     "summary": "资源补丁：localmode",
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "伊莎花嫁bgm改妖精小姐的魔法邀约",
@@ -26,7 +25,8 @@ const PATCHES = [
     "changes": [
       "将「伊莎花嫁bgm」替换为「妖精小姐的魔法邀约」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "剑姬小小语音改亚丝娜(含立绘)",
@@ -39,7 +39,8 @@ const PATCHES = [
     "changes": [
       "将「剑姬小小语音」替换为「亚丝娜」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "半藏花嫁改昔涟(动态)",
@@ -52,7 +53,8 @@ const PATCHES = [
     "changes": [
       "将「半藏花嫁」替换为「昔涟」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "哈利睡衣改空弦修女(动态立绘)",
@@ -65,7 +67,8 @@ const PATCHES = [
     "changes": [
       "将「哈利睡衣」替换为「空弦修女」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "哈利睡衣最初立绘及看板(文件替换和打了静谧反和谐都适用)",
@@ -78,7 +81,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "圣都梦幻岛地图补丁(明日方舟版）",
@@ -91,7 +95,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "墨姐专属曲改红A专属曲",
@@ -104,7 +109,8 @@ const PATCHES = [
     "changes": [
       "将「墨姐专属曲」替换为「红A专属曲」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "大厅和局内bgm改昔涟",
@@ -117,7 +123,8 @@ const PATCHES = [
     "changes": [
       "将「大厅和局内bgm」替换为「昔涟」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "大厅默认改雪见春华-缇米",
@@ -130,7 +137,8 @@ const PATCHES = [
     "changes": [
       "将「大厅默认」替换为「雪见春华-缇米」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "局内默认改雪见春华-缇米",
@@ -143,7 +151,8 @@ const PATCHES = [
     "changes": [
       "将「局内默认」替换为「雪见春华-缇米」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦狐原皮改剑兔阿米娅(动态立绘)",
@@ -156,7 +165,8 @@ const PATCHES = [
     "changes": [
       "将「梦狐原皮」替换为「剑兔阿米娅」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦狐原皮改剑兔阿米娅动态立绘(含立绘语音)",
@@ -169,7 +179,8 @@ const PATCHES = [
     "changes": [
       "将「梦狐原皮」替换为「剑兔阿米娅动态立绘」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "比武招亲改崩坏三九周年爱莉主题曲",
@@ -182,7 +193,8 @@ const PATCHES = [
     "changes": [
       "将「比武招亲」替换为「崩坏三九周年爱莉主题曲」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "比武招亲改雪见春华-缇米",
@@ -195,7 +207,8 @@ const PATCHES = [
     "changes": [
       "将「比武招亲」替换为「雪见春华-缇米」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "水平线的彼端改Aira",
@@ -208,7 +221,8 @@ const PATCHES = [
     "changes": [
       "将「水平线的彼端」替换为「Aira」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "登陆界面改Aira",
@@ -221,7 +235,8 @@ const PATCHES = [
     "changes": [
       "将「登陆界面」替换为「Aira」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "英雄出征改Little Wish",
@@ -234,7 +249,8 @@ const PATCHES = [
     "changes": [
       "将「英雄出征」替换为「Little Wish」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "蝶恋花 何处谣改アンヴェイル (Unveil)",
@@ -247,7 +263,8 @@ const PATCHES = [
     "changes": [
       "将「蝶恋花 何处谣」替换为「アンヴェイル」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "雏鹰赛季皮改鸣潮绯雪(动态)",
@@ -260,7 +277,8 @@ const PATCHES = [
     "changes": [
       "将「雏鹰赛季皮」替换为「鸣潮绯雪」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "黍按钮",
@@ -273,7 +291,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "155_8",
@@ -281,12 +300,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "306.0 KB",
-    "url": "https://gitee.com/aonohana/300m-patch-files-2/releases/download/v1.0/155_8.assetbundle",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/LuCy%E7%9A%84%E8%A1%A5%E4%B8%81/155_8.assetbundle",
     "summary": "资源补丁：155_8",
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "乐正龙牙 不凡改 number one bankai",
@@ -299,7 +319,8 @@ const PATCHES = [
     "changes": [
       "将「乐正龙牙 不凡」替换为「 number one bankai」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "凯拉 剑姬 红莲双子整合包",
@@ -312,7 +333,8 @@ const PATCHES = [
     "changes": [
       "替换角色模型/皮肤",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "剑姬纯白花嫁改尼尔机械纪元 2B",
@@ -325,7 +347,8 @@ const PATCHES = [
     "changes": [
       "将「剑姬纯白花嫁」替换为「尼尔机械纪元 2B」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "卡娅恶龙觉醒改明日香PASS皮（名字忘记了qwq）",
@@ -338,7 +361,8 @@ const PATCHES = [
     "changes": [
       "将「卡娅恶龙觉醒」替换为「明日香PASS皮」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天启音乐整合包（会更新）",
@@ -351,7 +375,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左目SD偶像团改水柱富冈义勇",
@@ -364,7 +389,8 @@ const PATCHES = [
     "changes": [
       "将「左目SD偶像团」替换为「水柱富冈义勇」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左目王国骑士改火之神神乐继承人炭治郎",
@@ -377,7 +403,8 @@ const PATCHES = [
     "changes": [
       "将「左目王国骑士」替换为「火之神神乐继承人炭治郎」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "无名小小剑士改桐人（野野原柚花版）",
@@ -390,7 +417,8 @@ const PATCHES = [
     "changes": [
       "将「无名小小剑士」替换为「桐人」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "无名通行证皮改旗木卡卡西",
@@ -403,7 +431,8 @@ const PATCHES = [
     "changes": [
       "将「无名通行证皮」替换为「旗木卡卡西」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "替换大喜",
@@ -416,7 +445,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "本多烙印战士改格斯狂战士",
@@ -429,7 +459,8 @@ const PATCHES = [
     "changes": [
       "将「本多烙印战士」替换为「格斯狂战士」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "法斯塔尔天启皮改黑崎一护虚化面具（第一版）",
@@ -442,7 +473,8 @@ const PATCHES = [
     "changes": [
       "将「法斯塔尔天启皮」替换为「黑崎一护虚化面具」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "法斯塔尔海洋皮改千年血战完现术一护",
@@ -455,7 +487,8 @@ const PATCHES = [
     "changes": [
       "将「法斯塔尔海洋皮」替换为「千年血战完现术一护」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "浅井赛季皮改女仆长可可（含动态立绘大厅专属音乐）",
@@ -468,7 +501,8 @@ const PATCHES = [
     "changes": [
       "将「浅井赛季皮」替换为「女仆长可可」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "瞳",
@@ -481,7 +515,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "米米",
@@ -494,7 +529,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉亚赛季皮改尼禄",
@@ -507,7 +543,8 @@ const PATCHES = [
     "changes": [
       "将「莉亚赛季皮」替换为「尼禄」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉鸭绝对冰域改吉罗婷冰霜勇者",
@@ -520,7 +557,8 @@ const PATCHES = [
     "changes": [
       "将「莉鸭绝对冰域」替换为「吉罗婷冰霜勇者」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "解决了想在大厅听音乐不想在战斗听音乐有觉得关来关去特别烦的问题",
@@ -533,7 +571,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "贝丝原皮改卍解露琪亚",
@@ -546,7 +585,8 @@ const PATCHES = [
     "changes": [
       "将「贝丝原皮」替换为「卍解露琪亚」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "迪亚布罗原皮改千年血战蓝染",
@@ -559,7 +599,8 @@ const PATCHES = [
     "changes": [
       "将「迪亚布罗原皮」替换为「千年血战蓝染」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "追光者罗琳改怪盗潘托姆",
@@ -572,7 +613,8 @@ const PATCHES = [
     "changes": [
       "将「追光者罗琳」替换为「怪盗潘托姆」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "黑诚天启皮改牛头虚白",
@@ -585,7 +627,8 @@ const PATCHES = [
     "changes": [
       "将「黑诚天启皮」替换为「牛头虚白」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "KEY语音改心灵终结半机械人先驱",
@@ -593,12 +636,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "3.3 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files/releases/download/v1.0/KEY%E8%AF%AD%E9%9F%B3%E6%94%B9%E5%BF%83%E7%81%B5%E7%BB%88%E7%BB%93%E5%8D%8A%E6%9C%BA%E6%A2%B0%E4%BA%BA%E5%85%88%E9%A9%B1.zip",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/Zn%E7%9A%84%E8%A1%A5%E4%B8%81/KEY%E8%AF%AD%E9%9F%B3%E6%94%B9%E5%BF%83%E7%81%B5%E7%BB%88%E7%BB%93%E5%8D%8A%E6%9C%BA%E6%A2%B0%E4%BA%BA%E5%85%88%E9%A9%B1.zip",
     "summary": "语音资源：KEY语音改心灵终结半机械人先驱",
     "changes": [
       "替换对应角色语音/播报",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "乐正龙牙去衣补丁 (静态，未和谐)",
@@ -611,7 +655,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "佩姬原皮去衣补丁（静态，未和谐）",
@@ -624,7 +669,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "千竹泳装去衣补丁（静态，反和谐）",
@@ -637,7 +683,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "千竹语音改心灵终结莫拉莱斯",
@@ -650,7 +697,8 @@ const PATCHES = [
     "changes": [
       "替换对应角色语音/播报",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "卡娅泳装去衣补丁（动态）",
@@ -663,7 +711,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天依sp唤醒去衣补丁（静态，未和谐）",
@@ -676,7 +725,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天叶羽去衣补丁（静态，未和谐）",
@@ -689,7 +739,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "悠音去衣补丁（静态）",
@@ -702,7 +753,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "斯洛卡伊双子去衣补丁（静态，未和谐）",
@@ -715,7 +767,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梅蒂尔去衣补丁（静态，反和谐）",
@@ -728,7 +781,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梅蒂尔灼华去衣补丁 (静态，未和谐)",
@@ -741,7 +795,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦狐泳装去衣补丁（静态，反和谐）",
@@ -754,7 +809,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "樱山水风纪委员去衣补丁（静态）",
@@ -767,7 +823,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "歌洛丽丝去衣补丁（静态，未和谐）",
@@ -780,7 +837,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "泠鸢桔梗去衣补丁（静态）",
@@ -793,7 +851,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "洛可可语音改心灵终结军医",
@@ -806,7 +865,8 @@ const PATCHES = [
     "changes": [
       "替换对应角色语音/播报",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "洛天依sp去衣补丁（静态，未和谐）",
@@ -819,7 +879,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "浅井去衣补丁（静态，未和谐）",
@@ -832,7 +893,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "特蕾莎小小恶蛛去衣补丁（静态，反和谐）",
@@ -845,7 +907,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "琳恩圣天使贞德去衣补丁 (静态，未和谐)",
@@ -858,7 +921,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "琳恩沧溟去衣补丁（静态，未和谐）",
@@ -871,7 +935,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "琳恩白皇后去衣补丁 (静态，反和谐)",
@@ -884,7 +949,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "白钰袖悠闲夏日去衣补丁（静态，未和谐）",
@@ -897,7 +963,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "瞳宝万圣去衣补丁（静态，反和谐）",
@@ -910,7 +977,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "瞳宝泳装去衣补丁（静态，反和谐）",
@@ -923,7 +991,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "瞳宝潮玩去衣补丁（静态，未和谐）",
@@ -936,7 +1005,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "米米新春去衣补丁（动态，未和谐）",
@@ -949,7 +1019,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉娅StarryNight去衣补丁 (静态，未和谐)",
@@ -962,7 +1033,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉娅中秋去衣补丁 (静态，未和谐)",
@@ -975,7 +1047,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉娅中秋去衣补丁 (静态，未和谐) (1)",
@@ -988,7 +1061,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "蒂塔芯片皮去衣补丁（静态，反和谐）",
@@ -1001,7 +1075,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "蒂塔芯片皮连体黑丝补丁（静态，反和谐）",
@@ -1014,7 +1089,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "西瓜原皮去衣补丁（静态，未和谐）",
@@ -1027,7 +1103,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "赛德去衣补丁 (静态，未和谐)",
@@ -1040,7 +1117,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "铃兰小小漏胸补丁（动态，反和谐）",
@@ -1053,7 +1131,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "铃兰蔷薇花嫁去衣补丁（静态，未和谐）",
@@ -1066,7 +1145,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "阿希娅去衣补丁（静态，未和谐）",
@@ -1079,7 +1159,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "阿库玛创世骑士去衣补丁 (静态，反和谐)",
@@ -1092,7 +1173,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "风铃儿悠闲夏日去衣补丁（静态，未和谐）",
@@ -1105,7 +1187,8 @@ const PATCHES = [
     "changes": [
       "角色外观资源替换",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "125",
@@ -1113,12 +1196,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "4.0 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files-2/releases/download/v1.0/125.assetbundle",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/%E5%85%B4%E6%AC%A3%E7%9A%84%E5%90%9B%E8%8E%AB%E7%AC%91%E8%A1%A5%E4%B8%81/125.assetbundle",
     "summary": "资源补丁：125",
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "125_skin6",
@@ -1131,7 +1215,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "125skin6",
@@ -1144,7 +1229,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "sp天依原皮改觉醒",
@@ -1157,7 +1243,8 @@ const PATCHES = [
     "changes": [
       "将「sp天依原皮」替换为「觉醒」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "sp天依补丁侠客行",
@@ -1170,7 +1257,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "yousa大喜界面音乐改吉祥话",
@@ -1183,7 +1271,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "乐正绫浴袍",
@@ -1196,7 +1285,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "佩奇魔法战鸡改初音未来",
@@ -1209,7 +1299,8 @@ const PATCHES = [
     "changes": [
       "将「佩奇魔法战鸡」替换为「初音未来」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "八神龙的传人",
@@ -1222,7 +1313,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑 梦狐子弹",
@@ -1235,7 +1327,8 @@ const PATCHES = [
     "changes": [
       "替换技能/攻击特效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑花嫁语音补丁",
@@ -1248,7 +1341,8 @@ const PATCHES = [
     "changes": [
       "替换对应角色语音/播报",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "和人",
@@ -1261,7 +1355,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "墨姐改歌姬修复",
@@ -1274,7 +1369,8 @@ const PATCHES = [
     "changes": [
       "将「墨姐」替换为「歌姬修复」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天依原皮异色桃花源",
@@ -1287,7 +1383,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "宇智波贝斯",
@@ -1300,7 +1397,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "对局按钮开始游戏改开始坐牢",
@@ -1313,7 +1411,8 @@ const PATCHES = [
     "changes": [
       "将「对局按钮开始游戏」替换为「开始坐牢」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "崩坏学园2壁纸（第五张壁纸改）",
@@ -1326,7 +1425,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左木王国骑士改君莫笑",
@@ -1339,7 +1439,8 @@ const PATCHES = [
     "changes": [
       "将「左木王国骑士」替换为「君莫笑」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "抽象头像ur",
@@ -1352,7 +1453,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦狐归来",
@@ -1365,7 +1467,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "次元大作战英雄+皮肤模型包",
@@ -1378,7 +1481,8 @@ const PATCHES = [
     "changes": [
       "替换角色模型/皮肤",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "法斯天启皮改黑崎一护",
@@ -1391,7 +1495,8 @@ const PATCHES = [
     "changes": [
       "将「法斯天启皮」替换为「黑崎一护」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "牢凯子武士改红莲（基础试玩版）",
@@ -1404,7 +1509,8 @@ const PATCHES = [
     "changes": [
       "将「牢凯子武士」替换为「红莲」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "聊天框优化",
@@ -1417,7 +1523,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "花嫁君莫笑",
@@ -1430,7 +1537,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "蕾姆原皮改白毛小猫",
@@ -1443,7 +1551,8 @@ const PATCHES = [
     "changes": [
       "将「蕾姆原皮」替换为「白毛小猫」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "蝴蝶改黑雪姬修复",
@@ -1456,7 +1565,8 @@ const PATCHES = [
     "changes": [
       "将「蝴蝶」替换为「黑雪姬修复」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "黑暗来袭改初音味来",
@@ -1469,7 +1579,8 @@ const PATCHES = [
     "changes": [
       "将「黑暗来袭」替换为「初音味来」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "龙族上杉绘梨衣壁纸（第一张室内背景改）",
@@ -1482,7 +1593,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "data部分技能特效编号（君莫笑，天叶诚，乐正龙牙）",
@@ -1490,12 +1602,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "24.7 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files-2/releases/download/v1.0/data%E9%83%A8%E5%88%86%E6%8A%80%E8%83%BD%E7%89%B9%E6%95%88%E7%BC%96%E5%8F%B7%EF%BC%88%E5%90%9B%E8%8E%AB%E7%AC%91%EF%BC%8C%E5%A4%A9%E5%8F%B6%E8%AF%9A%EF%BC%8C%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99%EF%BC%89.zip",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/%E5%A4%9C%E5%B0%94%E7%9A%84%E8%A1%A5%E4%B8%81/data%E9%83%A8%E5%88%86%E6%8A%80%E8%83%BD%E7%89%B9%E6%95%88%E7%BC%96%E5%8F%B7%EF%BC%88%E5%90%9B%E8%8E%AB%E7%AC%91%EF%BC%8C%E5%A4%A9%E5%8F%B6%E8%AF%9A%EF%BC%8C%E4%B9%90%E6%AD%A3%E9%BE%99%E7%89%99%EF%BC%89.zip",
     "summary": "特效资源：data部分技能特效编号",
     "changes": [
       "替换技能/连击特效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "凌音武器改腐殖之剑",
@@ -1508,7 +1621,8 @@ const PATCHES = [
     "changes": [
       "将「凌音武器」替换为「腐殖之剑」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "剑姬武器改雾切",
@@ -1521,7 +1635,8 @@ const PATCHES = [
     "changes": [
       "将「剑姬武器」替换为「雾切」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "剑姬花嫁武器改花涧",
@@ -1534,7 +1649,8 @@ const PATCHES = [
     "changes": [
       "将「剑姬花嫁武器」替换为「花涧」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "加载界面修改樱花夜海",
@@ -1547,7 +1663,8 @@ const PATCHES = [
     "changes": [
       "将「加载界面修」替换为「樱花夜海」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "卡芙卡按键和登录字幕",
@@ -1560,7 +1677,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑品红图标（技能，连击）",
@@ -1573,7 +1691,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑技能音效改真兵器",
@@ -1586,7 +1705,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑改丛雨",
@@ -1599,7 +1719,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑」替换为「丛雨」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑枪改火麒麟矛形态调整",
@@ -1612,7 +1733,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑枪」替换为「火麒麟矛形态调整」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑淡蓝色皮肤加两张伞皮",
@@ -1625,7 +1747,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑矛形态改幻塔雅诺武器 枪形态改空琦日奈mg42",
@@ -1638,7 +1761,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑矛形态」替换为「幻塔雅诺武器 枪形态改空琦日奈mg42」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑矛改忌炎枪加mg42",
@@ -1651,7 +1775,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑矛」替换为「忌炎枪加mg42」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑紫红特效",
@@ -1664,7 +1789,8 @@ const PATCHES = [
     "changes": [
       "替换技能/连击特效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑连击特效改神之翼",
@@ -1677,7 +1803,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑连击特效」替换为「神之翼」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑青龙特效",
@@ -1690,7 +1817,8 @@ const PATCHES = [
     "changes": [
       "替换技能/连击特效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑，夜雨声烦皮肤蒙面",
@@ -1703,7 +1831,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "壁纸1+伞皮",
@@ -1716,7 +1845,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "夜雨声烦武器改终极战斗仪",
@@ -1729,7 +1859,8 @@ const PATCHES = [
     "changes": [
       "将「夜雨声烦武器」替换为「终极战斗仪」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天启改圣都地图加贴图",
@@ -1742,7 +1873,8 @@ const PATCHES = [
     "changes": [
       "将「天启」替换为「圣都地图加贴图」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "局内背景音乐改天狗舞踏会",
@@ -1755,7 +1887,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "幻想万华镜标题",
@@ -1768,7 +1901,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "技能特效修改（君莫笑，诚哥）",
@@ -1781,7 +1915,8 @@ const PATCHES = [
     "changes": [
       "将「技能特效修」替换为「」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "按键名改牢名",
@@ -1794,7 +1929,8 @@ const PATCHES = [
     "changes": [
       "将「按键名」替换为「牢名」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "无名sd改蓬莱寺九霄（音图）",
@@ -1807,7 +1943,8 @@ const PATCHES = [
     "changes": [
       "将「无名sd」替换为「蓬莱寺九霄」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦幻岛改圣都加贴图",
@@ -1820,7 +1957,8 @@ const PATCHES = [
     "changes": [
       "将「梦幻岛」替换为「圣都加贴图」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦幻岛改圣都加贴图a",
@@ -1833,7 +1971,8 @@ const PATCHES = [
     "changes": [
       "将「梦幻岛」替换为「圣都加贴图a」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦幻岛防御塔改水神瞳和烤串",
@@ -1846,7 +1985,8 @@ const PATCHES = [
     "changes": [
       "将「梦幻岛防御塔」替换为「水神瞳和烤串」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "水晶改诺亚扎基",
@@ -1859,7 +1999,8 @@ const PATCHES = [
     "changes": [
       "将「水晶」替换为「诺亚扎基」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "永远の荣耀标题",
@@ -1872,7 +2013,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "状态名修改",
@@ -1885,7 +2027,8 @@ const PATCHES = [
     "changes": [
       "将「状态名修」替换为「」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "狂龙诚哥武器改天火劫灭",
@@ -1898,7 +2041,8 @@ const PATCHES = [
     "changes": [
       "将「狂龙诚哥武器」替换为「天火劫灭」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "白毛赛贝斯加冰霜和天火圣裁",
@@ -1911,7 +2055,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "红温诚哥加水晶刀",
@@ -1924,7 +2069,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "背景壁纸",
@@ -1937,7 +2083,8 @@ const PATCHES = [
     "changes": [
       "替换界面/标题/壁纸",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉亚武器改欧布圣剑",
@@ -1950,7 +2097,8 @@ const PATCHES = [
     "changes": [
       "将「莉亚武器」替换为「欧布圣剑」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "表情包修改（高兴，哭泣）",
@@ -1963,7 +2111,8 @@ const PATCHES = [
     "changes": [
       "将「表情包修」替换为「」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "赛贝斯改崩二琪亚娜（音图）",
@@ -1976,7 +2125,8 @@ const PATCHES = [
     "changes": [
       "将「赛贝斯」替换为「崩二琪亚娜」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "路径",
@@ -1989,7 +2139,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "防御塔改水晶花",
@@ -2002,7 +2153,8 @@ const PATCHES = [
     "changes": [
       "将「防御塔」替换为「水晶花」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "雷奥改东方定助（音，图）",
@@ -2015,7 +2167,8 @@ const PATCHES = [
     "changes": [
       "将「雷奥」替换为「东方定助」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "魔龙按键改色加时崎狂三",
@@ -2028,7 +2181,8 @@ const PATCHES = [
     "changes": [
       "将「魔龙按键」替换为「色加时崎狂三」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "黑诚武器改双刀",
@@ -2041,7 +2195,8 @@ const PATCHES = [
     "changes": [
       "将「黑诚武器」替换为「双刀」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "2dui_attack_select_bg",
@@ -2049,12 +2204,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "2.2 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files-2/releases/download/v1.0/2dui_attack_select_bg.assetbundle",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/%E5%B0%8F%E6%98%8E%E7%9A%84%E8%A1%A5%E4%B8%81/2dui_attack_select_bg.assetbundle",
     "summary": "界面/看板资源：2dui_attack_select_bg",
     "changes": [
       "替换界面或看板资源",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "battleuiskin_7013atlas",
@@ -2067,7 +2223,8 @@ const PATCHES = [
     "changes": [
       "替换界面或看板资源",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "墨改原神伞兵看板",
@@ -2080,7 +2237,8 @@ const PATCHES = [
     "changes": [
       "将「墨」替换为「原神伞兵看板」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "小小剑姬改中文亚丝娜（缝合版）",
@@ -2093,7 +2251,8 @@ const PATCHES = [
     "changes": [
       "将「小小剑姬」替换为「中文亚丝娜」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "白沙sd改莉可利斯泷奈",
@@ -2106,7 +2265,8 @@ const PATCHES = [
     "changes": [
       "将「白沙sd」替换为「莉可利斯泷奈」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "16",
@@ -2114,12 +2274,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-09-01",
     "size": "18.2 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files-2/releases/download/v1.0/16.zip",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/%E7%A7%8B%E6%9C%88%E7%9A%84%E8%A1%A5%E4%B8%81/16.zip",
     "summary": "资源补丁：16",
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "bgm修改one last kiss",
@@ -2132,7 +2293,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "东海帝王语音播报",
@@ -2145,7 +2307,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "亚丝娜1.0",
@@ -2158,7 +2321,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "亚丝娜语音播报",
@@ -2171,7 +2335,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "优香语音播报",
@@ -2184,7 +2349,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "切西亚改姬塔",
@@ -2197,7 +2363,8 @@ const PATCHES = [
     "changes": [
       "将「切西亚」替换为「姬塔」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "千早爱音",
@@ -2210,7 +2377,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "复读姬改东雪莲",
@@ -2223,7 +2391,8 @@ const PATCHES = [
     "changes": [
       "将「复读姬」替换为「东雪莲」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天叶诚改但丁",
@@ -2236,7 +2405,8 @@ const PATCHES = [
     "changes": [
       "将「天叶诚」替换为「但丁」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "女拳改重岳",
@@ -2249,7 +2419,8 @@ const PATCHES = [
     "changes": [
       "将「女拳」替换为「重岳」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "小小剑士改桐人",
@@ -2262,7 +2433,8 @@ const PATCHES = [
     "changes": [
       "将「小小剑士」替换为「桐人」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左目改椎名立希",
@@ -2275,7 +2447,8 @@ const PATCHES = [
     "changes": [
       "将「左目」替换为「椎名立希补丁」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "想你了，牢猴",
@@ -2288,7 +2461,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "改天童爱丽丝",
@@ -2301,7 +2475,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "明日香·语音播报",
@@ -2314,7 +2489,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "晓美焰",
@@ -2327,7 +2503,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "暗黑地牢先祖播音",
@@ -2340,7 +2517,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "曼城茶座语音播报",
@@ -2353,7 +2531,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "樱庭云改红a",
@@ -2366,7 +2545,8 @@ const PATCHES = [
     "changes": [
       "将「樱庭云」替换为「红a」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "泷村改亚索",
@@ -2379,7 +2559,8 @@ const PATCHES = [
     "changes": [
       "将「泷村」替换为「亚索」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "浅井改初音未来",
@@ -2392,7 +2573,8 @@ const PATCHES = [
     "changes": [
       "将「浅井」替换为「初音未来」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "游戏bgm修改：ai优香 one last kiss",
@@ -2405,7 +2587,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "火行开大自带bgm（蓄势）",
@@ -2418,7 +2601,8 @@ const PATCHES = [
     "changes": [
       "替换游戏音乐/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "烙印战士 格斯",
@@ -2431,7 +2615,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "熔炽改空条徐伦",
@@ -2444,7 +2629,8 @@ const PATCHES = [
     "changes": [
       "将「熔炽」替换为「空条徐伦」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "特蕾希娅",
@@ -2457,7 +2643,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "砂狼白子语音播报bp阶段",
@@ -2470,7 +2657,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "米米改永雏塔菲",
@@ -2483,7 +2671,8 @@ const PATCHES = [
     "changes": [
       "将「米米」替换为「永雏塔菲」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "米雪儿语音播报",
@@ -2496,7 +2685,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "老头改梅林",
@@ -2509,7 +2699,8 @@ const PATCHES = [
     "changes": [
       "将「老头」替换为「梅林」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "腕豪",
@@ -2522,7 +2713,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "自由之翼 三笠语音",
@@ -2535,7 +2727,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉雅ursp改黑呆",
@@ -2548,7 +2741,8 @@ const PATCHES = [
     "changes": [
       "将「莉雅ursp」替换为「黑呆」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "莉雅改阿尔托莉雅",
@@ -2561,7 +2755,8 @@ const PATCHES = [
     "changes": [
       "将「莉雅」替换为「阿尔托莉雅」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "要乐奈列表",
@@ -2574,7 +2769,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "贝丝改梣",
@@ -2587,7 +2783,8 @@ const PATCHES = [
     "changes": [
       "将「贝丝」替换为「梣」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "赛德 日语",
@@ -2600,7 +2797,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "追光改joker",
@@ -2613,7 +2811,8 @@ const PATCHES = [
     "changes": [
       "将「追光」替换为「joker」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "钉宫语音播报",
@@ -2626,7 +2825,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "长崎素世",
@@ -2639,7 +2839,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "雨宫莲英雄头像以及技能图标",
@@ -2652,7 +2853,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "雨宫莲语音播报",
@@ -2665,7 +2867,8 @@ const PATCHES = [
     "changes": [
       "替换角色语音/音效",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "雷奥改高松灯",
@@ -2678,7 +2881,8 @@ const PATCHES = [
     "changes": [
       "将「雷奥」替换为「高松灯」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "高松灯",
@@ -2691,7 +2895,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "魔法少女鹿目圆",
@@ -2704,7 +2909,8 @@ const PATCHES = [
     "changes": [
       "资源替换补丁",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "黎斐拉改优妮",
@@ -2717,7 +2923,8 @@ const PATCHES = [
     "changes": [
       "将「黎斐拉」替换为「优妮」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "黑城改黑崎一护一版(1)",
@@ -2730,7 +2937,8 @@ const PATCHES = [
     "changes": [
       "将「黑城」替换为「黑崎一护一版」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "sd偶像团改迷途之子整合包",
@@ -2738,12 +2946,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "33.5 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files/releases/download/v1.0/sd%E5%81%B6%E5%83%8F%E5%9B%A2%E6%94%B9%E8%BF%B7%E9%80%94%E4%B9%8B%E5%AD%90%E6%95%B4%E5%90%88%E5%8C%85.zip",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/%E9%B1%BC%E7%8E%96%E7%9A%84%E8%A1%A5%E4%B8%81/sd%E5%81%B6%E5%83%8F%E5%9B%A2%E6%94%B9%E8%BF%B7%E9%80%94%E4%B9%8B%E5%AD%90%E6%95%B4%E5%90%88%E5%8C%85.zip",
     "summary": "皮肤替换：sd偶像团 → 迷途之子整合包",
     "changes": [
       "将「sd偶像团」替换为「迷途之子整合包」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "主界面加载和背景图改蔚蓝档案",
@@ -2756,7 +2965,8 @@ const PATCHES = [
     "changes": [
       "将「主界面加载和背景图」替换为「蔚蓝档案」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "八神教父风云改奈克瑟斯奥特曼",
@@ -2769,7 +2979,8 @@ const PATCHES = [
     "changes": [
       "将「八神教父风云」替换为「奈克瑟斯奥特曼」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "千代小小猫娘改才羽桃井",
@@ -2782,7 +2993,8 @@ const PATCHES = [
     "changes": [
       "将「千代小小猫娘」替换为「才羽桃井」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "千竹改才羽绿",
@@ -2795,7 +3007,8 @@ const PATCHES = [
     "changes": [
       "将「千竹」替换为「才羽绿」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "半藏花嫁改人之律者爱莉希雅",
@@ -2808,7 +3021,8 @@ const PATCHES = [
     "changes": [
       "将「半藏花嫁」替换为「人之律者爱莉希雅」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "博哈拉异变突击改忍战带土",
@@ -2821,7 +3035,8 @@ const PATCHES = [
     "changes": [
       "将「博哈拉异变突击」替换为「忍战带土」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "博哈拉改雷古洛思奥特曼",
@@ -2834,7 +3049,8 @@ const PATCHES = [
     "changes": [
       "将「博哈拉」替换为「雷古洛思奥特曼」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑原创改砂狼白子（色彩）",
@@ -2847,7 +3063,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑原创」替换为「砂狼白子」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑改空崎日奈",
@@ -2860,7 +3077,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑」替换为「空崎日奈」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "君莫笑改阿罗娜",
@@ -2873,7 +3091,8 @@ const PATCHES = [
     "changes": [
       "将「君莫笑」替换为「阿罗娜」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "大厅2d背景图改日奈记忆大厅",
@@ -2886,7 +3105,8 @@ const PATCHES = [
     "changes": [
       "将「大厅2d背景图」替换为「日奈记忆大厅」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天叶诚UR改但丁",
@@ -2899,7 +3119,8 @@ const PATCHES = [
     "changes": [
       "将「天叶诚UR」替换为「但丁」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "天叶诚狂龙奥义改饮月",
@@ -2912,7 +3133,8 @@ const PATCHES = [
     "changes": [
       "将「天叶诚狂龙奥义」替换为「饮月」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "小k女仆改陆八魔阿露",
@@ -2925,7 +3147,8 @@ const PATCHES = [
     "changes": [
       "将「小k女仆」替换为「陆八魔阿露」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "小小天叶诚改佐助",
@@ -2938,7 +3161,8 @@ const PATCHES = [
     "changes": [
       "将「小小天叶诚」替换为「佐助」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左目战火豪情改鸣上悠",
@@ -2951,7 +3175,8 @@ const PATCHES = [
     "changes": [
       "将「左目战火豪情」替换为「鸣上悠」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左目泳装改灶门炭治郎",
@@ -2964,7 +3189,8 @@ const PATCHES = [
     "changes": [
       "将「左目泳装」替换为「灶门炭治郎」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "左目王国骑士改维吉尔",
@@ -2977,7 +3203,8 @@ const PATCHES = [
     "changes": [
       "将「左目王国骑士」替换为「维吉尔」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "徵羽摩柯改结城理",
@@ -2990,7 +3217,8 @@ const PATCHES = [
     "changes": [
       "将「徵羽摩柯」替换为「结城理」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "忍战雷影技能音效改牢大",
@@ -3003,7 +3231,8 @@ const PATCHES = [
     "changes": [
       "将「忍战雷影技能音效」替换为「牢大」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "拳皇bgm改四代目火影",
@@ -3016,7 +3245,8 @@ const PATCHES = [
     "changes": [
       "将「拳皇bgm」替换为「四代目火影」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "梦狐改空崎日奈",
@@ -3029,7 +3259,8 @@ const PATCHES = [
     "changes": [
       "将「梦狐」替换为「空崎日奈」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "法斯塔尔sd改丰川祥子",
@@ -3042,7 +3273,8 @@ const PATCHES = [
     "changes": [
       "将「法斯塔尔sd」替换为「丰川祥子」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "漂泊带土改维吉尔",
@@ -3055,7 +3287,8 @@ const PATCHES = [
     "changes": [
       "将「漂泊带土」替换为「维吉尔」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "火影忍者鸣人播报改王小桃",
@@ -3068,7 +3301,8 @@ const PATCHES = [
     "changes": [
       "将「火影忍者鸣人播报」替换为「王小桃」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "电音天道超语音包",
@@ -3081,7 +3315,8 @@ const PATCHES = [
     "changes": [
       "替换对应角色语音/播报",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "白沙改小鸟游星野",
@@ -3094,7 +3329,8 @@ const PATCHES = [
     "changes": [
       "将「白沙」替换为「小鸟游星野」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "白钰秀改天道佩恩",
@@ -3107,7 +3343,8 @@ const PATCHES = [
     "changes": [
       "将「白钰秀」替换为「天道佩恩」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "罗小黑改波风水门",
@@ -3120,7 +3357,8 @@ const PATCHES = [
     "changes": [
       "将「罗小黑」替换为「波风水门」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "芬里尔生如夏花和女仆改黑见芹香",
@@ -3133,7 +3371,8 @@ const PATCHES = [
     "changes": [
       "将「芬里尔生如夏花和女仆」替换为「黑见芹香」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "花嫁白玉秀改礼服日奈（如果是私用请v我1块，共用补丁不计收费）",
@@ -3146,7 +3385,8 @@ const PATCHES = [
     "changes": [
       "将「花嫁白玉秀」替换为「礼服日奈」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "花嫁白钰秀改礼服日奈",
@@ -3159,7 +3399,8 @@ const PATCHES = [
     "changes": [
       "将「花嫁白钰秀」替换为「礼服日奈」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "蔚蓝档案主题懒人包",
@@ -3167,12 +3408,13 @@ const PATCHES = [
     "type": "resource",
     "date": "2026-08-30",
     "size": "90.0 MB",
-    "url": "https://gitee.com/aonohana/300m-patch-files/releases/download/v1.0/%E8%94%9A%E8%93%9D%E6%A1%A3%E6%A1%88%E4%B8%BB%E9%A2%98%E6%87%92%E4%BA%BA%E5%8C%85.zip",
+    "url": "https://raw.githubusercontent.com/LvShu2009/patch-download/main/patches/%E9%B1%BC%E7%8E%96%E7%9A%84%E8%A1%A5%E4%B8%81/%E8%94%9A%E8%93%9D%E6%A1%A3%E6%A1%88%E4%B8%BB%E9%A2%98%E6%87%92%E4%BA%BA%E5%8C%85.zip",
     "summary": "整合包：蔚蓝档案主题懒人包",
     "changes": [
       "整合多项资源的补丁包",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "github"
   },
   {
     "title": "雪原创武将皮改银河奥特曼",
@@ -3185,7 +3427,8 @@ const PATCHES = [
     "changes": [
       "将「雪原创武将皮」替换为「银河奥特曼」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "青年艾技能音效改牢大",
@@ -3198,7 +3441,8 @@ const PATCHES = [
     "changes": [
       "将「青年艾技能音效」替换为「牢大」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "青年雷影罗太语音包",
@@ -3211,7 +3455,8 @@ const PATCHES = [
     "changes": [
       "替换对应角色语音/播报",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "飞鸟潮玩改天童爱丽丝",
@@ -3224,7 +3469,8 @@ const PATCHES = [
     "changes": [
       "将「飞鸟潮玩」替换为「天童爱丽丝」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "鱼玖补丁英雄头像整合",
@@ -3237,7 +3483,8 @@ const PATCHES = [
     "changes": [
       "整合多项资源的补丁包",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   },
   {
     "title": "龙牙蔷薇骑士改永恒闪耀特利迦",
@@ -3250,6 +3497,7 @@ const PATCHES = [
     "changes": [
       "将「龙牙蔷薇骑士」替换为「永恒闪耀特利迦」",
       "下载解压后覆盖到游戏对应目录生效"
-    ]
+    ],
+    "source": "friend"
   }
 ];
