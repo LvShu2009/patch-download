@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub 批量上传工具 · 文件夹版</title>
+<style>
+  :root {
+    --bg: #0f1115; --card: #1a1d24; --card-2: #222630; --border: #313745;
+    --text: #e6e9ef; --muted: #9aa3b2; --accent: #6c8cff; --green: #3fb950;
+    --red: #f85149; --yellow: #d29922; --shadow: 0 8px 30px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; padding: 32px 16px 60px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 26px; }
+  header h1 { font-size: 26px; letter-spacing: .5px; }
+  header p { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow);
+  }
+  .card h2 { font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card h2 .num {
+    background: var(--accent); color: #fff; width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 12px; flex: 0 0 auto;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  label { font-size: 12px; color: var(--muted); }
+  label .req { color: var(--red); }
+  input[type=text], input[type=password], input[type=number] {
+    background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 12px; border-radius: 8px; font-size: 14px; outline: none; width: 100%;
+    transition: border-color .2s;
+  }
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: #5b6474; }
+  select {
+    background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 12px; border-radius: 8px; font-size: 14px; outline: none; width: 100%;
+    transition: border-color .2s; cursor: pointer;
+  }
+  select:focus { border-color: var(--accent); }
+  select:disabled { opacity: .5; cursor: not-allowed; }
+  .hint { font-size: 11px; color: #6f7889; }
+  .savebar { margin-top: 18px; padding: 14px 16px; background: var(--card-2); border: 1px solid var(--border); border-radius: 10px; }
+  .savebar-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .savebar-title span { font-weight: 400; color: var(--muted); font-size: 11px; }
+  .token-row { display: flex; gap: 8px; }
+  .token-row input { flex: 1; }
+  .btn {
+    border: none; cursor: pointer; border-radius: 8px; font-size: 13px; font-weight: 600;
+    padding: 10px 18px; transition: filter .2s, transform .1s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+  .btn-ghost { background: var(--card-2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--accent); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  .notice { background: rgba(210,153,34,.1); border: 1px solid rgba(210,153,34,.35); color: #e3b341;
+    font-size: 12px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; line-height: 1.7; }
+  .notice a { color: #79c0ff; }
+  .tip { background: rgba(63,185,80,.08); border: 1px solid rgba(63,185,80,.3); color: #8fd99a;
+    font-size: 12px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; line-height: 1.75; }
+  .tip b { color: #b7f0bf; }
+
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .choice {
+    background: var(--card-2); border: 1.5px solid var(--border); border-radius: 11px;
+    padding: 18px 16px; text-align: left; cursor: pointer; color: var(--text); transition: .18s;
+  }
+  .choice:hover { border-color: var(--accent); background: rgba(108,140,255,.07); transform: translateY(-2px); }
+  .choice .ico { font-size: 26px; display: block; margin-bottom: 8px; }
+  .choice .t { font-size: 14px; font-weight: 700; display: block; }
+  .choice .d { font-size: 11px; color: var(--muted); display: block; margin-top: 5px; line-height: 1.6; }
+
+  .dropzone {
+    border: 1.5px dashed var(--border); border-radius: 10px; padding: 16px;
+    text-align: center; color: var(--muted); cursor: pointer; transition: .2s; margin-top: 14px;
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--accent); background: rgba(108,140,255,.06); }
+
+  .filelist { margin-top: 14px; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
+  .fileitem {
+    display: flex; align-items: center; gap: 10px; background: var(--card-2);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px;
+  }
+  .fileitem .name { min-width: 150px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fileitem .path { flex: 1; color: #8fa6d8; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fileitem .size { color: var(--muted); font-size: 12px; min-width: 64px; text-align: right; }
+  .fileitem .status { font-size: 12px; min-width: 70px; text-align: right; }
+  .st-wait { color: var(--muted); } .st-upload { color: var(--accent); }
+  .st-ok { color: var(--green); } .st-err { color: var(--red); }
+  .st-skip { color: #8b93a5; } .st-check { color: var(--yellow); }
+  .fileitem .del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; }
+  .fileitem .del:hover { color: var(--red); }
+
+  .bar-wrap { height: 8px; background: var(--card-2); border-radius: 6px; overflow: hidden; margin-top: 14px; }
+  .bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), #9db4ff); transition: width .25s; }
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .toolbar.top { margin-top: 0; }
+  .progress-text { font-size: 12px; color: var(--muted); }
+
+  .log { margin-top: 14px; max-height: 240px; overflow-y: auto; font-size: 12px; background: #0d0f13;
+    border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .log div { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.03); word-break: break-all; }
+  .log .ok { color: var(--green); } .log .err { color: var(--red); } .log .info { color: var(--muted); }
+  .log a { color: #79c0ff; text-decoration: underline; }
+
+  details summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+  details p { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  code { background: var(--card-2); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+  /* ---------- 描述编辑 ---------- */
+  textarea {
+    background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 12px; border-radius: 8px; font-size: 14px; outline: none; width: 100%;
+    font-family: inherit; line-height: 1.6; transition: border-color .2s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: #5b6474; }
+  .changes-input { min-height: 76px; resize: vertical; }
+  .meta-tip { background: rgba(108,140,255,.08); border: 1px solid rgba(108,140,255,.3); color: #b9c8ff;
+    font-size: 12px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; line-height: 1.8; }
+  .meta-tip b { color: #dbe3ff; }
+  .fileitem .edit { background: none; border: 1px solid var(--border); color: var(--muted);
+    cursor: pointer; font-size: 11px; padding: 3px 7px; border-radius: 6px; line-height: 1.4; white-space: nowrap; }
+  .fileitem .edit:hover { border-color: var(--accent); color: var(--accent); }
+  .fileitem .edit.set { border-color: var(--green); color: var(--green); }
+  .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.62); z-index: 50;
+    display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; padding: 22px 24px; box-shadow: var(--shadow); }
+  .modal h3 { font-size: 16px; margin-bottom: 4px; }
+  .modal .sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; word-break: break-all; }
+  .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  @media (max-width: 620px) { .grid, .choices { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>GitHub 批量上传工具 · 文件夹版</h1>
+    <p>选整个文件夹 → 保留目录结构上传 → 仓库自动出现同名文件夹。令牌仅在你浏览器与 GitHub 之间传输。</p>
+  </header>
+
+  <div class="notice">
+    <b>使用前准备：</b>
+    ① 在 GitHub 创建好目标仓库；
+    ② 生成个人访问令牌：<a href="https://github.com/settings/tokens" target="_blank">GitHub → Settings → Developer settings → Personal access tokens</a>，生成时勾选 <code>repo</code> 权限（Classic 令牌）；
+    ③ 令牌只在你本地浏览器使用，本工具不会保存或上传它，用完建议在 GitHub 删除。
+  </div>
+
+  <div class="tip">
+    <b>关于"文件夹"：</b>Git 仓库里没有需要单独新建的空文件夹——文件夹是跟着文件路径自动生成的。
+    比如上传文件到 <code>ACNZ的补丁/某补丁.pak</code>，仓库里就会自动出现 <code>ACNZ的补丁</code> 文件夹，
+    点进去就是里面的文件，每个都能单独打开和下载。所以你只要选文件夹上传，结构就自动建好了。
+  </div>
+
+  <!-- 配置 -->
+  <div class="card">
+    <h2><span class="num">1</span>仓库配置</h2>
+    <div class="grid">
+      <div class="field full">
+        <label>GitHub 个人访问令牌 <span class="req">*</span></label>
+        <div class="token-row">
+          <input type="password" id="token" placeholder="ghp_ 开头" autocomplete="off">
+          <button class="btn btn-ghost btn-sm" id="toggleToken" type="button">显示</button>
+        </div>
+        <div class="hint">Classic 令牌需 repo 权限；Fine-grained 令牌需 Contents: read and write。点下方「💾 保存配置」后会记住，下次打开自动填好。</div>
+      </div>
+      <div class="field">
+        <label>仓库所有者 <span class="req">*</span></label>
+        <input type="text" id="owner" placeholder="你的 GitHub 用户名">
+      </div>
+      <div class="field">
+        <label>仓库名 <span class="req">*</span></label>
+        <input type="text" id="repo" placeholder="例如 patch-download">
+      </div>
+      <div class="field">
+        <label>分支名</label>
+        <input type="text" id="branch" value="main" placeholder="默认 main">
+      </div>
+      <div class="field">
+        <label>仓库内目标目录（可选）</label>
+        <div class="token-row">
+          <input type="text" id="dir" placeholder="例如 patches，留空为仓库根目录">
+          <button class="btn btn-ghost btn-sm" id="loadFoldersBtn" type="button" title="从仓库拉取已有文件夹">📂 加载</button>
+        </div>
+        <select id="folderSelect" disabled style="margin-top:8px">
+          <option value="">— 先点「加载」拉取仓库文件夹 —</option>
+        </select>
+        <div class="hint">点「📂 加载」列出仓库里已有的文件夹，点选即填入；也可手动输入。上传的文件会作为它的子内容放进去。</div>
+      </div>
+    </div>
+
+    <!-- 配置记忆 -->
+    <div class="savebar">
+      <div class="savebar-title">💾 配置记忆 <span>（填一次，下次打开自动填好，不用再输令牌）</span></div>
+      <div class="toolbar top" style="margin-top:10px">
+        <button class="btn btn-primary btn-sm" id="saveCfgBtn" type="button">保存配置</button>
+        <button class="btn btn-ghost btn-sm" id="exportCfgBtn" type="button">导出到文件</button>
+        <button class="btn btn-ghost btn-sm" id="importCfgBtn" type="button">从文件导入</button>
+        <button class="btn btn-ghost btn-sm" id="clearCfgBtn" type="button">清除保存</button>
+        <input type="file" id="importCfgFile" accept=".json,.txt" hidden>
+      </div>
+      <div class="hint" id="saveStatus" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <!-- 选择 -->
+  <div class="card">
+    <h2><span class="num">2</span>选择要上传的内容</h2>
+    <div class="choices">
+      <button class="choice" id="chooseFolderBtn" type="button">
+        <span class="ico">📁</span>
+        <span class="t">选择整个文件夹</span>
+        <span class="d">保留文件夹内所有层级结构（含最外层文件夹名）。适合按"作者/分类"整包上传，仓库会自动生成同名文件夹。建议电脑上操作。</span>
+      </button>
+      <button class="choice" id="chooseFilesBtn" type="button">
+        <span class="ico">📄</span>
+        <span class="t">选择多个文件（平铺）</span>
+        <span class="d">只上传选中的文件本身，不带目录结构，直接放到上面的目标目录。也可把文件拖拽到下方。</span>
+      </button>
+    </div>
+    <div class="dropzone" id="dropzone">把文件拖拽到这里（平铺上传）</div>
+    <input type="file" id="fileInput" multiple hidden>
+    <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
+
+    <div class="filelist" id="filelist"></div>
+    <div class="toolbar">
+      <button class="btn btn-ghost btn-sm" id="clearBtn" type="button">清空列表</button>
+      <span class="progress-text" id="fileSummary">共 0 个文件，0 B</span>
+      <span class="progress-text" id="dirSummary"></span>
+    </div>
+  </div>
+
+  <!-- 补丁描述 -->
+  <div class="card">
+    <h2><span class="num">3</span>补丁描述（填了会同步到网站）</h2>
+    <div class="tip">
+      <b>这里填的内容会随上传一起写进仓库的 <code id="metaPathShow">patches/meta.json</code></b>，网站同步后就会用你写的标题 / 简介 / 更新内容，<b>不再显示默认的"新增补丁文件"</b>。<br>
+      • 下面这套是「本批统一描述」。如果一次传多个补丁、每个描述不同，点上面文件列表里每行的 <b>✎ 单独</b> 单独填（单独填的会覆盖统一描述）。<br>
+      • 描述留空的字段不会覆盖仓库里原有的描述，方便你只改其中某一项。<br>
+      • 以后想改描述，也可以<b>直接在 GitHub 网页上打开 <code>patches/meta.json</code> 编辑并提交</b>，网站刷新后自动生效。
+    </div>
+    <div class="grid">
+      <div class="field full">
+        <label>描述文件路径（须和网站 config.js 里的 repo.dir 一致）</label>
+        <input type="text" id="metaPath" value="patches/meta.json" placeholder="patches/meta.json">
+      </div>
+      <div class="field">
+        <label>标题（留空 = 用文件名）</label>
+        <input type="text" id="globalTitle" placeholder="例如：诺斯III号音速少女去衣补丁（静态）">
+      </div>
+      <div class="field">
+        <label>日期（留空 = 自动用今天）</label>
+        <input type="text" id="globalDate" placeholder="2026-11-27">
+      </div>
+      <div class="field full">
+        <label>分类（留空 = 按文件夹路径自动判断）</label>
+        <input type="text" id="globalCategory" placeholder="例如：Zn的补丁">
+      </div>
+      <div class="field full">
+        <label>简介（列表里名称下方的小字）</label>
+        <input type="text" id="globalSummary" placeholder="例如：外观资源：诺斯III号音速少女去衣补丁">
+      </div>
+      <div class="field full">
+        <label>更新内容（一行一条，展开后显示）</label>
+        <textarea id="globalChanges" class="changes-input" placeholder="新增静态去衣补丁&#10;下载解压后覆盖到游戏对应目录生效"></textarea>
+      </div>
+    </div>
+    <div class="toolbar top">
+      <button class="btn btn-ghost btn-sm" id="pullMetaBtn" type="button">↓ 拉取已有描述</button>
+      <button class="btn btn-ghost btn-sm" id="clearMetaBtn" type="button">清空描述表单</button>
+      <span class="progress-text" id="metaStatus"></span>
+    </div>
+  </div>
+
+  <!-- 上传 -->
+  <div class="card">
+    <h2><span class="num">4</span>开始上传</h2>
+    <div class="field full" style="margin-bottom:14px">
+      <label>上传策略</label>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;">
+        <label style="display:flex;align-items:center;gap:6px;color:var(--text);cursor:pointer">
+          <input type="radio" name="strategy" value="incremental" checked> 增量更新（推荐）：跳过未变化的文件，只传新增/改动
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;color:var(--text);cursor:pointer">
+          <input type="radio" name="strategy" value="force"> 强制覆盖：全部重新上传
+        </label>
+      </div>
+      <div class="hint" style="margin-top:6px">增量更新会先比对文件指纹，内容一样就跳过，避免重复提交；同路径文件永远只会有一个，不会产生重复文件夹。</div>
+    </div>
+    <div class="toolbar top">
+      <button class="btn btn-primary" id="startBtn" type="button">🚀 开始上传</button>
+      <button class="btn btn-ghost btn-sm" id="testBtn" type="button">测试连接</button>
+      <span class="progress-text" id="progressText"></span>
+    </div>
+    <div class="bar-wrap"><div class="bar" id="bar"></div></div>
+    <div class="log" id="log"><div class="info">日志输出区…</div></div>
+    <details style="margin-top:12px">
+      <summary>上传说明</summary>
+      <p>
+        • 增量更新：本地按 Git 规则算文件指纹（已验证与 GitHub 返回的一致），与仓库里的对比，一样就跳过，只传新增/改动的文件。<br>
+        • 新增文件上传后会成为独立文件；同名路径永远只有一个文件，覆盖更新，不会产生重复文件夹。<br>
+        • 单个文件上限 100 MB（GitHub Contents API 限制）；超过 100 MB 的文件需改用 Git LFS，本工具不适用。<br>
+        • 文件列表里的"仓库路径"就是上传后它在仓库里的位置，可先核对再上传。<br>
+        • 只有真正上传/更新的文件才产生 commit，跳过的不会；遇到限流（403/429）会自动等待重试。<br>
+        • 成功后日志给出每个文件的独立链接：点开即单文件页面 / 原始文件地址（raw.githubusercontent.com），方便单独调用。<br>
+        • <b>描述同步</b>：第 3 步填的描述会写进仓库的 <code>patches/meta.json</code>，网站打开时读取它显示你写的标题/简介/更新内容。留空字段不覆盖原有描述；描述文件的内容没变化不会产生多余提交。
+      </p>
+    </details>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  let files = []; // { file, rel, path, status, el, meta }
+  const META_PATH_DEFAULT = 'patches/meta.json';
+
+  // UTF-8 安全的 base64 编解码（GitHub contents API 传输中文描述需要）
+  function utf8ToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+  function base64ToUtf8(b64) {
+    const bin = atob(String(b64).replace(/\s/g, ''));
+    const arr = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder().decode(arr);
+  }
+  function metaPath() { return ($('metaPath').value.trim() || META_PATH_DEFAULT).replace(/^\/+|\/+$/g, ''); }
+
+  function fmtSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+  }
+
+  function log(msg, cls, link) {
+    const box = $('log');
+    if (box.dataset.empty === '1') { box.innerHTML = ''; box.dataset.empty = ''; }
+    const d = document.createElement('div');
+    d.className = cls || 'info';
+    if (link) {
+      const a = document.createElement('a');
+      a.href = link; a.target = '_blank'; a.rel = 'noopener'; a.textContent = msg;
+      d.appendChild(a);
+    } else {
+      d.textContent = msg;
+    }
+    box.appendChild(d);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ---------- 配置记忆（localStorage + 文件导入导出）----------
+  const CFG_KEY = 'gh_batch_uploader_cfg_v1';
+  const CFG_FIELDS = ['token', 'owner', 'repo', 'branch', 'dir', 'metaPath',
+    'globalTitle', 'globalSummary', 'globalCategory', 'globalDate', 'globalChanges'];
+
+  function setSaveStatus(text, cls) {
+    const el = $('saveStatus');
+    el.textContent = text || '';
+    el.style.color = cls === 'ok' ? 'var(--green)' : (cls === 'err' ? 'var(--red)' : 'var(--muted)');
+  }
+  function collectConfig() {
+    const o = {};
+    CFG_FIELDS.forEach(id => { const el = $(id); if (el) o[id] = el.value; });
+    o._savedAt = new Date().toISOString();
+    return o;
+  }
+  function applyConfig(o) {
+    if (!o || typeof o !== 'object') return;
+    let n = 0;
+    CFG_FIELDS.forEach(id => {
+      if (Object.prototype.hasOwnProperty.call(o, id) && $(id)) { $(id).value = o[id]; n++; }
+    });
+    $('metaPathShow').textContent = metaPath();
+    return n;
+  }
+  function saveConfig(quiet) {
+    try {
+      localStorage.setItem(CFG_KEY, JSON.stringify(collectConfig()));
+      setSaveStatus('✓ 已保存配置（' + new Date().toLocaleString('zh-CN') + '），下次打开自动填好', 'ok');
+      if (!quiet) log('配置已保存到本机浏览器。', 'ok');
+      return true;
+    } catch (e) {
+      setSaveStatus('保存失败：' + e.message + '（可改用「导出到文件」）', 'err');
+      if (!quiet) log('保存配置失败：' + e.message, 'err');
+      return false;
+    }
+  }
+  function loadConfig() {
+    try {
+      const raw = localStorage.getItem(CFG_KEY);
+      if (!raw) { setSaveStatus('', ''); return; }
+      const o = JSON.parse(raw);
+      const n = applyConfig(o);
+      setSaveStatus('已自动载入上次保存的配置（' + n + ' 项' +
+        (o._savedAt ? '，' + new Date(o._savedAt).toLocaleString('zh-CN') : '') + '）', 'ok');
+      log('已自动载入上次保存的配置（含令牌）。', 'ok');
+    } catch (e) {
+      setSaveStatus('读取保存配置失败：' + e.message, 'err');
+    }
+  }
+  function clearConfig() {
+    try { localStorage.removeItem(CFG_KEY); } catch (e) {}
+    setSaveStatus('已清除本机保存的配置', '');
+    log('已清除本机保存的配置（令牌也已从本机移除）。', 'info');
+  }
+  function exportConfig() {
+    const data = JSON.stringify(collectConfig(), null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'github-uploader-config.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setSaveStatus('✓ 已导出配置文件（含令牌，请妥善保管）', 'ok');
+    log('配置已导出为文件 github-uploader-config.json。', 'ok');
+  }
+
+  function cfg() {
+    return {
+      token: $('token').value.trim(),
+      owner: $('owner').value.trim(),
+      repo: $('repo').value.trim(),
+      branch: $('branch').value.trim() || 'main',
+      dir: $('dir').value.trim().replace(/^\/+|\/+$/g, '')
+    };
+  }
+
+  function checkCfg() {
+    const c = cfg();
+    if (!c.token) { alert('请填写 GitHub 个人访问令牌'); return null; }
+    if (!c.owner) { alert('请填写仓库所有者'); return null; }
+    if (!c.repo) { alert('请填写仓库名'); return null; }
+    return c;
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result).split(',')[1]);
+      r.onerror = () => reject(new Error('读取文件失败'));
+      r.readAsDataURL(file);
+    });
+  }
+
+  // ---------- SHA-1 / Git blob sha（用于增量比对）----------
+  function rotl(x, n) { return ((x << n) | (x >>> (32 - n))) | 0; }
+  function sha1Hex(bytes) {
+    const ml = bytes.length * 8;
+    const withOne = bytes.length + 1;
+    const zeroPad = (withOne % 64 <= 56) ? (56 - withOne % 64) : (64 + 56 - withOne % 64);
+    const total = withOne + zeroPad + 8;
+    const buf = new Uint8Array(total);
+    buf.set(bytes);
+    buf[bytes.length] = 0x80;
+    const dv = new DataView(buf.buffer);
+    dv.setUint32(total - 8, Math.floor(ml / 0x100000000), false);
+    dv.setUint32(total - 4, ml >>> 0, false);
+    let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+    const w = new Int32Array(80);
+    for (let i = 0; i < total; i += 64) {
+      for (let t = 0; t < 16; t++) w[t] = dv.getUint32(i + t * 4, false);
+      for (let t = 16; t < 80; t++) w[t] = rotl(w[t - 3] ^ w[t - 8] ^ w[t - 14] ^ w[t - 16], 1);
+      let a = h0, b = h1, c = h2, d = h3, e = h4;
+      for (let t = 0; t < 80; t++) {
+        let f, k;
+        if (t < 20) { f = (b & c) | ((~b) & d); k = 0x5A827999; }
+        else if (t < 40) { f = b ^ c ^ d; k = 0x6ED9EBA1; }
+        else if (t < 60) { f = (b & c) | (b & d) | (c & d); k = 0x8F1BBCDC; }
+        else { f = b ^ c ^ d; k = 0xCA62C1D6; }
+        const temp = (rotl(a, 5) + f + e + k + w[t]) | 0;
+        e = d; d = c; c = rotl(b, 30); b = a; a = temp;
+      }
+      h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0; h4 = (h4 + e) | 0;
+    }
+    const out = new Uint8Array(20); const odv = new DataView(out.buffer);
+    odv.setInt32(0, h0, false); odv.setInt32(4, h1, false); odv.setInt32(8, h2, false);
+    odv.setInt32(12, h3, false); odv.setInt32(16, h4, false);
+    return Array.from(out).map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+  function gitBlobSha(buffer) {
+    const header = new TextEncoder().encode('blob ' + buffer.byteLength + '\0');
+    const all = new Uint8Array(header.length + buffer.byteLength);
+    all.set(header); all.set(new Uint8Array(buffer), header.length);
+    return sha1Hex(all);
+  }
+  function localSha(file) {
+    return file.arrayBuffer().then(buf => gitBlobSha(buf));
+  }
+
+  // 目标目录变化时，刷新每个文件最终仓库路径
+  function refreshPaths() {
+    const d = cfg().dir;
+    files.forEach(it => { it.path = d ? d + '/' + it.rel : it.rel; });
+  }
+
+  function addFiles(fileArr, keepStructure) {
+    fileArr.forEach(f => {
+      let rel = f.name;
+      if (keepStructure && f.webkitRelativePath) rel = f.webkitRelativePath;
+      const d = cfg().dir;
+      files.push({ file: f, rel: rel, path: d ? d + '/' + rel : rel, status: '等待', meta: null });
+    });
+    render();
+  }
+
+  // GitHub API 请求封装（含限流重试 403/429）
+  async function api(path, options, c) {
+    const url = 'https://api.github.com/' + path;
+    let res;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const opt = Object.assign({}, options);
+      const baseHeaders = {
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      };
+      // 有令牌才带认证头；拉取公开仓库文件夹时可不带令牌
+      if (c.token) baseHeaders['Authorization'] = 'token ' + c.token;
+      opt.headers = Object.assign(baseHeaders, options.headers || {});
+      res = await fetch(url, opt);
+      // 主限流 429 / 二次限流 403（message 含 rate limit）
+      if (res.status === 429 || res.status === 403) {
+        let isRate = res.status === 429;
+        if (res.status === 403) {
+          try { const j = await res.clone().json(); isRate = /rate limit|abuse|secondary/i.test(j.message || ''); } catch (e) {}
+        }
+        if (isRate) {
+          const ra = res.headers.get('Retry-After');
+          const wait = ra ? (parseInt(ra, 10) * 1000) : (3000 * (attempt + 1));
+          log('遇到限流，等待 ' + Math.round(wait / 1000) + ' 秒后重试…', 'info');
+          await new Promise(r => setTimeout(r, Math.min(wait, 60000)));
+          continue;
+        }
+      }
+      break;
+    }
+    return res;
+  }
+
+  async function uploadOne(item, c) {
+    const filePath = item.path;
+    const encPath = filePath.split('/').map(encodeURIComponent).join('/');
+    const base = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/contents/' + encPath;
+    const getUrl = base + '?ref=' + encodeURIComponent(c.branch);
+
+    // 增量模式：先取远端文件信息（含 sha）
+    let remoteSha = null;
+    const getRes = await api(getUrl, { method: 'GET' }, c);
+    if (getRes.ok) {
+      const info = await getRes.json();
+      if (!Array.isArray(info)) remoteSha = info.sha;
+    } else if (getRes.status !== 404) {
+      let msg = 'HTTP ' + getRes.status;
+      try { const j = await getRes.json(); msg = j.message || msg; } catch (e) {}
+      log('  提示：查询远端文件失败(' + msg + ')，将直接上传', 'info');
+    }
+
+    const incremental = document.querySelector('input[name=strategy]:checked').value === 'incremental';
+    if (incremental && remoteSha) {
+      const lsha = await localSha(item.file);
+      if (lsha === remoteSha) {
+        const raw = 'https://raw.githubusercontent.com/' + c.owner + '/' + c.repo + '/' + c.branch + '/' + encPath;
+        return { skipped: true, page: raw, raw: raw };
+      }
+    }
+
+    const content = await fileToBase64(item.file);
+    const body = {
+      message: 'batch upload: ' + filePath,
+      content: content,
+      branch: c.branch
+    };
+    if (remoteSha) body.sha = remoteSha;
+    const action = remoteSha ? 'update' : 'create';
+
+    const res = await api(base, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }, c);
+
+    if (!res.ok) {
+      let msg = 'HTTP ' + res.status;
+      try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+      throw new Error(msg);
+    }
+    const data = await res.json();
+    const raw = 'https://raw.githubusercontent.com/' + c.owner + '/' + c.repo + '/' + c.branch + '/' + encPath;
+    const page = (data.content && data.content.html_url) ? data.content.html_url : raw;
+    return { skipped: false, action: action, page: page, raw: raw };
+  }
+
+  function setStatus(item, cls, text) {
+    item.status = text;
+    if (item.el) { item.el.textContent = text; item.el.className = 'status ' + cls; }
+  }
+
+  function render() {
+    const list = $('filelist');
+    list.innerHTML = '';
+    files.forEach((item, idx) => {
+      const row = document.createElement('div'); row.className = 'fileitem';
+      const name = document.createElement('div'); name.className = 'name'; name.textContent = item.file.name; name.title = item.file.name;
+      const path = document.createElement('div'); path.className = 'path'; path.textContent = item.path; path.title = item.path;
+      const size = document.createElement('div'); size.className = 'size'; size.textContent = fmtSize(item.file.size);
+      const status = document.createElement('div'); status.className = 'status st-wait'; status.textContent = '等待';
+      const edit = document.createElement('button'); edit.className = 'edit' + (item.meta ? ' set' : '');
+      edit.textContent = item.meta ? '✎已填' : '✎ 单独'; edit.title = '单独填写这个文件的描述';
+      edit.onclick = () => openMetaEditor(idx);
+      const del = document.createElement('button'); del.className = 'del'; del.textContent = '×'; del.title = '移除';
+      del.onclick = () => { files.splice(idx, 1); render(); };
+      row.append(name, path, size, edit, status, del);
+      list.appendChild(row);
+      item.el = status;
+    });
+    const total = files.reduce((s, i) => s + i.file.size, 0);
+    $('fileSummary').textContent = '共 ' + files.length + ' 个文件，' + fmtSize(total);
+    const d = cfg().dir;
+    $('dirSummary').textContent = files.length ? '(将传到 ' + (d || '仓库根目录') + ')' : '';
+  }
+
+  // ---------- 描述编辑 ----------
+  function parseChanges(text) {
+    return String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  }
+  function globalMeta() {
+    const title = $('globalTitle').value.trim();
+    const summary = $('globalSummary').value.trim();
+    const category = $('globalCategory').value.trim();
+    const date = $('globalDate').value.trim() || new Date().toISOString().slice(0, 10);
+    const changes = parseChanges($('globalChanges').value);
+    const m = {};
+    if (title) m.title = title;
+    if (summary) m.summary = summary;
+    if (category) m.category = category;
+    if (date) m.date = date;
+    if (changes.length) m.changes = changes;
+    return m;
+  }
+  function metaKey(item) {
+    // 用仓库相对路径做 key，同时兼容网站按文件名查找
+    const d = cfg().dir;
+    let rel = item.rel;
+    return d ? d + '/' + rel : rel;
+  }
+  function fileNameOf(path) { return decodeURIComponent(String(path).split('/').pop().split('?')[0]); }
+
+  function openMetaEditor(idx) {
+    const item = files[idx];
+    if (!item) return;
+    const base = globalMeta();
+    const cur = Object.assign({}, base, item.meta || {});
+    const mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.innerHTML = `
+      <div class="modal">
+        <h3>单个文件描述</h3>
+        <div class="sub">${item.path}</div>
+        <div class="grid">
+          <div class="field"><label>标题（留空 = 文件名）</label><input type="text" id="emTitle"></div>
+          <div class="field"><label>日期（留空 = 今天）</label><input type="text" id="emDate"></div>
+          <div class="field full"><label>分类（留空 = 自动判断）</label><input type="text" id="emCategory"></div>
+          <div class="field full"><label>简介</label><input type="text" id="emSummary"></div>
+          <div class="field full"><label>更新内容（一行一条）</label><textarea id="emChanges" class="changes-input"></textarea></div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-ghost btn-sm" id="emCancel">取消</button>
+          <button class="btn btn-ghost btn-sm" id="emClear">清除单独设置</button>
+          <button class="btn btn-primary btn-sm" id="emSave">保存</button>
+        </div>
+      </div>`;
+    document.body.appendChild(mask);
+    $('emTitle').value = cur.title || '';
+    $('emDate').value = cur.date || '';
+    $('emCategory').value = cur.category || '';
+    $('emSummary').value = cur.summary || '';
+    $('emChanges').value = (cur.changes || []).join('\n');
+    const close = () => mask.remove();
+    $('emCancel').onclick = close;
+    mask.onclick = e => { if (e.target === mask) close(); };
+    $('emClear').onclick = () => { item.meta = null; close(); render(); };
+    $('emSave').onclick = () => {
+      const m = {};
+      const t = $('emTitle').value.trim(), s = $('emSummary').value.trim();
+      const cat = $('emCategory').value.trim(), d = $('emDate').value.trim();
+      const ch = parseChanges($('emChanges').value);
+      if (t) m.title = t;
+      if (s) m.summary = s;
+      if (cat) m.category = cat;
+      if (d) m.date = d;
+      if (ch.length) m.changes = ch;
+      item.meta = Object.keys(m).length ? m : {};
+      close(); render();
+    };
+  }
+
+  // 读取仓库里的 meta.json（不存在返回空）
+  async function readMeta(c) {
+    const enc = metaPath().split('/').map(encodeURIComponent).join('/');
+    const url = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) +
+                '/contents/' + enc + '?ref=' + encodeURIComponent(c.branch);
+    const res = await api(url, { method: 'GET' }, c);
+    if (res.status === 404) return { data: {}, sha: null };
+    if (!res.ok) {
+      let msg = 'HTTP ' + res.status;
+      try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+      throw new Error('读取描述文件失败：' + msg);
+    }
+    const j = await res.json();
+    let data = {};
+    try { data = JSON.parse(base64ToUtf8(j.content)); } catch (e) {}
+    return { data: (data && typeof data === 'object') ? data : {}, sha: j.sha };
+  }
+
+  // 合并本批描述到 meta.json 并写回仓库
+  async function writeMeta(c, newEntries) {
+    const cur = await readMeta(c);
+    const data = Object.assign({}, cur.data);
+    Object.keys(newEntries).forEach(k => {
+      data[k] = Object.assign({}, data[k] || {}, newEntries[k]);
+    });
+    // 内容没变就不提交，避免无意义 commit
+    if (JSON.stringify(cur.data) === JSON.stringify(data)) return { skipped: true, count: Object.keys(data).length };
+    const enc = metaPath().split('/').map(encodeURIComponent).join('/');
+    const url = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/contents/' + enc;
+    const body = {
+      message: 'update patch descriptions (meta.json)',
+      content: utf8ToBase64(JSON.stringify(data, null, 2) + '\n'),
+      branch: c.branch
+    };
+    if (cur.sha) body.sha = cur.sha;
+    const res = await api(url, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    }, c);
+    if (!res.ok) {
+      let msg = 'HTTP ' + res.status;
+      try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+      throw new Error(msg);
+    }
+    return { skipped: false, count: Object.keys(data).length };
+  }
+
+  // 收集本批要写入的描述
+  function collectDescriptions() {
+    const base = globalMeta();
+    const out = {};
+    files.forEach(it => {
+      const m = Object.assign({}, base, it.meta || {});
+      // 有任意有效字段才写入
+      if (Object.keys(m).length) out[metaKey(it)] = m;
+    });
+    return out;
+  }
+
+  // ---------- 事件 ----------
+  $('chooseFolderBtn').onclick = () => $('folderInput').click();
+  $('chooseFilesBtn').onclick = () => $('fileInput').click();
+  $('dropzone').onclick = () => $('fileInput').click();
+  $('dropzone').ondragover = e => { e.preventDefault(); $('dropzone').classList.add('drag'); };
+  $('dropzone').ondragleave = () => $('dropzone').classList.remove('drag');
+  $('dropzone').ondrop = e => {
+    e.preventDefault(); $('dropzone').classList.remove('drag');
+    if (e.dataTransfer.files.length) addFiles(Array.from(e.dataTransfer.files), false);
+  };
+  $('fileInput').onchange = e => { addFiles(Array.from(e.target.files), false); e.target.value = ''; };
+  $('folderInput').onchange = e => { addFiles(Array.from(e.target.files), true); e.target.value = ''; };
+  $('dir').oninput = () => { refreshPaths(); render(); };
+  $('folderSelect').onchange = e => {
+    $('dir').value = e.target.value;
+    refreshPaths(); render();
+  };
+  $('clearBtn').onclick = () => { files = []; render(); };
+
+  // 拉取仓库已有文件夹，填充下拉框
+  $('loadFoldersBtn').onclick = async () => {
+    const c = cfg();
+    if (!c.owner) { alert('请填写仓库所有者'); return; }
+    if (!c.repo) { alert('请填写仓库名'); return; }
+    $('loadFoldersBtn').disabled = true;
+    log('正在拉取仓库文件夹列表…', 'info');
+    try {
+      const path = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) +
+                   '/git/trees/' + encodeURIComponent(c.branch) + '?recursive=1';
+      const res = await api(path, { method: 'GET' }, c);
+      if (!res.ok) {
+        let msg = 'HTTP ' + res.status;
+        try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+        throw new Error(msg);
+      }
+      const data = await res.json();
+      const folders = data.tree.filter(x => x.type === 'tree').map(x => x.path).sort();
+      const sel = $('folderSelect');
+      sel.innerHTML = '';
+      const rootOpt = document.createElement('option');
+      rootOpt.value = ''; rootOpt.textContent = '（仓库根目录）';
+      sel.appendChild(rootOpt);
+      folders.forEach(f => {
+        const o = document.createElement('option');
+        o.value = f; o.textContent = '📁 ' + f;
+        sel.appendChild(o);
+      });
+      // 若当前目录已存在，自动选中
+      if (folders.indexOf(c.dir) >= 0) sel.value = c.dir;
+      sel.disabled = false;
+      log('拉取成功：' + folders.length + ' 个文件夹可选。' +
+          (data.truncated ? '（列表可能被截断，仅显示部分）' : ''), 'ok');
+    } catch (e) {
+      log('拉取文件夹失败：' + e.message + '（先点「测试连接」确认配置）', 'err');
+    }
+    $('loadFoldersBtn').disabled = false;
+  };
+  $('toggleToken').onclick = () => {
+    const t = $('token'); const show = t.type === 'password';
+    t.type = show ? 'text' : 'password'; $('toggleToken').textContent = show ? '隐藏' : '显示';
+  };
+
+  $('metaPath').oninput = () => { $('metaPathShow').textContent = metaPath(); };
+
+  $('clearMetaBtn').onclick = () => {
+    $('globalTitle').value = ''; $('globalSummary').value = '';
+    $('globalCategory').value = ''; $('globalDate').value = '';
+    $('globalChanges').value = '';
+    files.forEach(f => { f.meta = null; });
+    $('metaStatus').textContent = ''; render();
+  };
+
+  // 从仓库拉取已有描述，按文件名/相对路径填充到当前文件（方便在此基础上修改）
+  $('pullMetaBtn').onclick = async () => {
+    const c = checkCfg(); if (!c) return;
+    $('pullMetaBtn').disabled = true; $('metaStatus').textContent = '拉取中…';
+    try {
+      const { data } = await readMeta(c);
+      let hit = 0;
+      files.forEach(it => {
+        const byPath = data[metaKey(it)];
+        const byName = data[fileNameOf(it.path)] || data[fileNameOf(it.rel)];
+        const m = byPath || byName;
+        if (m) { it.meta = Object.assign({}, m); hit++; }
+      });
+      const count = Object.keys(data).length;
+      $('metaStatus').textContent = '已拉取 ' + count + ' 条描述' + (files.length ? '，匹配到本批 ' + hit + ' 个文件' : '');
+      log('拉取描述成功：' + count + ' 条' + (files.length ? '，已匹配 ' + hit + ' 个文件' : '（先选文件可自动填充）'), 'ok');
+      render();
+    } catch (e) {
+      $('metaStatus').textContent = '拉取失败';
+      log('拉取描述失败：' + e.message, 'err');
+    }
+    $('pullMetaBtn').disabled = false;
+  };
+
+  $('testBtn').onclick = async () => {
+    const c = checkCfg(); if (!c) return;
+    $('testBtn').disabled = true;
+    log('测试连接中…', 'info');
+    try {
+      const path = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo);
+      const res = await api(path, { method: 'GET' }, c);
+      if (res.ok) {
+        const j = await res.json();
+        log('连接成功：' + j.full_name + '（默认分支 ' + j.default_branch + '）', 'ok');
+      } else {
+        let msg = 'HTTP ' + res.status;
+        try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+        log('连接失败：' + msg + '（检查令牌权限、仓库地址是否正确）', 'err');
+      }
+    } catch (e) { log('网络错误：' + e.message, 'err'); }
+    $('testBtn').disabled = false;
+  };
+
+  $('startBtn').onclick = async () => {
+    const c = checkCfg(); if (!c) return;
+    if (!files.length) { alert('请先选择文件或文件夹'); return; }
+    refreshPaths();
+    const btn = $('startBtn');
+    btn.disabled = true; $('bar').style.width = '0%';
+    const strategy = document.querySelector('input[name=strategy]:checked').value;
+    let ok = 0, fail = 0, skip = 0;
+    log('开始处理 ' + files.length + ' 个文件到 ' + c.owner + '/' + c.repo + ' [' + c.branch + ']，策略：' + (strategy === 'incremental' ? '增量更新' : '强制覆盖'), 'info');
+    for (let i = 0; i < files.length; i++) {
+      const item = files[i];
+      setStatus(item, 'st-check', '比对中');
+      try {
+        const links = await uploadOne(item, c);
+        if (links.skipped) {
+          setStatus(item, 'st-skip', '跳过');
+          skip++;
+          log('= 跳过（内容未变）' + item.path, 'info');
+        } else {
+          setStatus(item, 'st-ok', links.action === 'create' ? '新增' : '更新');
+          ok++;
+          log('✓ ' + (links.action === 'create' ? '新增 ' : '更新 ') + item.path + '  →  ', 'ok', links.page);
+          log('    原始文件地址：', 'info', links.raw);
+        }
+      } catch (e) {
+        setStatus(item, 'st-err', '失败'); fail++;
+        log('✗ ' + item.path + '  ' + e.message, 'err');
+      }
+      const pct = Math.round((i + 1) / files.length * 100);
+      $('bar').style.width = pct + '%';
+      $('progressText').textContent = (i + 1) + ' / ' + files.length + '（上传 ' + ok + '，跳过 ' + skip + '，失败 ' + fail + '）';
+    }
+    log('完成：上传/更新 ' + ok + ' 个，跳过 ' + skip + ' 个，失败 ' + fail + ' 个。', fail ? 'err' : 'ok');
+
+    // 描述同步：只要本批填了任何描述（全局或单独），就合并写入 meta.json
+    const desc = collectDescriptions();
+    if (Object.keys(desc).length) {
+      log('正在同步 ' + Object.keys(desc).length + ' 条补丁描述到 ' + metaPath() + ' …', 'info');
+      try {
+        const r = await writeMeta(c, desc);
+        if (r.skipped) log('= 描述无变化，已跳过重复提交', 'info');
+        else log('✓ 描述已写入 ' + metaPath() + '（共 ' + r.count + ' 条），网站同步后生效', 'ok');
+      } catch (e) {
+        log('✗ 描述同步失败：' + e.message + '（补丁文件本身已上传成功，可稍后重试）', 'err');
+      }
+    } else if (files.length) {
+      log('本次未填写描述，仓库里的 ' + metaPath() + ' 保持不变。', 'info');
+    }
+    btn.disabled = false;
+  };
+
+  // ---------- 配置记忆按钮 ----------
+  $('saveCfgBtn').onclick = () => saveConfig(false);
+  $('clearCfgBtn').onclick = () => {
+    if (confirm('确定清除本机保存的配置吗？（令牌也会一并移除）')) clearConfig();
+  };
+  $('exportCfgBtn').onclick = exportConfig;
+  $('importCfgBtn').onclick = () => $('importCfgFile').click();
+  $('importCfgFile').onchange = e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const o = JSON.parse(String(r.result));
+        const n = applyConfig(o);
+        setSaveStatus('✓ 已从文件导入 ' + n + ' 项配置', 'ok');
+        log('已从文件导入配置（' + n + ' 项），点「保存配置」可记住到本机。', 'ok');
+      } catch (err) {
+        setSaveStatus('导入失败：文件格式不对', 'err');
+        log('导入配置失败：' + err.message, 'err');
+      }
+    };
+    r.onerror = () => log('读取配置文件失败', 'err');
+    r.readAsText(f);
+    e.target.value = '';
+  };
+
+  // 输入即自动保存（防抖 1 秒），真正做到"填了就记住"；保存按钮作为手动兜底
+  let saveTimer = null;
+  CFG_FIELDS.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveConfig(true), 1000);
+    });
+  });
+
+  // 页面打开时自动载入上次保存的配置
+  loadConfig();
+  log('就绪。配置填了会自动记住，也可点「保存配置」/「导出到文件」。', 'info');
+})();
+</script>
+</body>
+</html>

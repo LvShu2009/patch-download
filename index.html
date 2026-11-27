@@ -247,9 +247,37 @@
       if (data.truncated) throw new Error("仓库文件过多，列表被截断");
 
       const dir = (REPO.dir || "").replace(/^\/+|\/+$/g, "");
+      // 描述文件位置（可用 config.js 的 repo.meta 覆盖，默认 dir/meta.json）
+      const metaFile = (REPO.meta || (dir ? dir + "/meta.json" : "meta.json"));
+      // 先把描述文件读进来（读取失败不影响主流程，按默认描述显示）
+      let metaMap = {};
+      try {
+        const encMeta = metaFile.split("/").map(encodeURIComponent).join("/");
+        const mr = await fetch(RAW_BASE + encMeta + "?t=" + Date.now(), { cache: "no-store" });
+        if (mr.ok) {
+          const mj = await mr.json();
+          if (mj && typeof mj === "object" && !Array.isArray(mj)) metaMap = mj;
+        }
+      } catch (e) {}
+      // 按「完整路径」或「文件名」两种 key 查描述（兼容上传工具与手动填写）
+      function descFor(path, fileName) {
+        return metaMap[path] || metaMap[fileName] || null;
+      }
+      function applyDesc(obj, desc) {
+        if (!desc) return obj;
+        if (desc.title) obj.title = desc.title;
+        if (desc.summary) obj.summary = desc.summary;
+        if (desc.changes && desc.changes.length) obj.changes = desc.changes;
+        if (desc.date) obj.date = desc.date;
+        if (desc.category) obj.category = desc.category;
+        return obj;
+      }
+
       // 仓库里的补丁文件：path 形如 patches/分类/文件名 或 patches/文件名
       const blobs = (data.tree || []).filter(x => x.type === "blob" &&
-        x.path.startsWith(dir ? dir + "/" : "") && x.path.toLowerCase() !== "readme.md");
+        x.path.startsWith(dir ? dir + "/" : "") &&
+        x.path !== metaFile && x.path.toLowerCase() !== "readme.md" &&
+        !x.path.toLowerCase().endsWith("/meta.json"));
 
       // 用文件名建立静态清单索引（含标题/简介/日期/更新内容）
       const staticByName = {};
@@ -269,14 +297,16 @@
         }
         const fileName = fileNameOf(fn);
         const meta = staticByName[fileName];
+        const desc = descFor(b.path, fileName);
         const encPath = b.path.split("/").map(encodeURIComponent).join("/");
         const raw = RAW_BASE + encPath;
         if (meta) {
-          // 静态清单里有：保留全部介绍信息，链接换成自己的 raw 源
-          merged.push(Object.assign({}, meta, { category: category, url: raw, source: "github", _auto: true }));
+          // 静态清单里有：保留介绍信息，链接换成自己的 raw 源；meta.json 里的描述优先覆盖
+          const item = Object.assign({}, meta, { category: category, url: raw, source: "github", _auto: true });
+          merged.push(applyDesc(item, desc));
         } else {
-          // 仓库里新加、清单里没有：自动生成条目
-          merged.push({
+          // 仓库里新加、清单里没有：自动生成条目（有 meta 描述就用它，否则用默认）
+          const item = {
             title: fileName,
             summary: "仓库新增补丁",
             size: fmtBytes(b.size),
@@ -286,22 +316,28 @@
             changes: ["新增补丁文件"],
             category: category,
             _auto: true, _new: true
-          });
+          };
+          merged.push(applyDesc(item, desc));
         }
       });
 
       // 静态清单里是镜像源（仓库中不存在）的条目仍保留，保证失效的那个还能显示
       const repoNames = new Set(blobs.map(b => fileNameOf(b.path)));
       staticData.forEach(p => {
-        if (p.source !== "github" && !repoNames.has(fileNameOf(p.url))) merged.push(p);
+        if (p.source !== "github" && !repoNames.has(fileNameOf(p.url))) {
+          const desc = descFor(fileNameOf(p.url), fileNameOf(p.url));
+          merged.push(applyDesc(Object.assign({}, p), desc));
+        }
       });
 
       patchData = merged;
       const newCount = merged.filter(p => p._new).length;
+      const descCount = Object.keys(metaMap).length;
       route(); // 用新数据重新渲染当前视图
       bar.className = "sync-bar ok";
       txt.textContent = "已同步仓库：共 " + merged.length + " 个补丁" +
-        (newCount ? "（含 " + newCount + " 个新增）" : "") + " · 自动更新已开启";
+        (newCount ? "（含 " + newCount + " 个新增）" : "") +
+        " · 描述已同步" + (descCount ? "（" + descCount + " 条自定义）" : "") + " · 自动更新已开启";
     } catch (e) {
       bar.className = "sync-bar err";
       txt.textContent = "同步失败（" + e.message + "），显示本地清单";

@@ -9,7 +9,8 @@ const SITE = {
     "owner": "LvShu2009",
     "name": "patch-download",
     "branch": "main",
-    "dir": "patches"
+    "dir": "patches",
+    "meta": "patches/meta.json"
   },
   "show_guide": false,
   "guide": [
