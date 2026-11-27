@@ -5,6 +5,12 @@ const SITE = {
   "announcement": "欢迎来到补丁下载中心，最新补丁见下方列表～",
   "bg_url": "https://www.loliapi.com/acg/",
   "footer": "本页面为《300大作战》玩家自建补丁下载与说明页面，仅用于补丁分发与介绍。游戏相关内容版权归官方所有。",
+  "repo": {
+    "owner": "LvShu2009",
+    "name": "patch-download",
+    "branch": "main",
+    "dir": "patches"
+  },
   "show_guide": false,
   "guide": [
     {

@@ -98,6 +98,17 @@
   .src-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 5px; vertical-align: middle; margin-left: 4px; }
   .src-tag.mine { background: #e6f7ed; color: #1a8a4a; }
   .src-tag.mirror { background: #f0f2f6; color: #8a9099; }
+  .src-tag.auto { background: #fff4e0; color: #b8860b; }
+  /* 同步状态条 */
+  .sync-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
+    margin-bottom: 14px; padding: 8px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
+  .sync-bar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .sync-bar.loading .dot { background: #d29922; animation: pulse 1s infinite; }
+  .sync-bar.ok .dot { background: #1a8a4a; }
+  .sync-bar.err .dot { background: #d64545; }
+  .sync-bar .refresh { margin-left: auto; color: var(--accent); cursor: pointer; font-weight: 600; flex-shrink: 0; }
+  .sync-bar .refresh:hover { text-decoration: underline; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
   .file-row .cell { font-size: 13px; color: var(--muted); }
   .btn { display: inline-block; padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: box-shadow .15s; }
   .btn.dl { background: var(--accent); color: #fff; text-align: center; box-shadow: 0 2px 8px rgba(37,99,235,.25); }
@@ -164,6 +175,7 @@
       <div class="sub" id="site-subtitle"></div>
       <div class="announce" id="site-announce"></div>
     </div>
+    <div class="sync-bar loading" id="sync-bar"><span class="dot"></span><span id="sync-text">正在从仓库同步最新补丁列表…</span><span class="refresh" id="sync-refresh">刷新</span></div>
     <div class="stat-line" id="stat-line"></div>
     <div class="cat-grid" id="cat-grid"></div>
     <div class="guide" id="guide"></div>
@@ -193,7 +205,12 @@
   const TYPE_LABEL = { client: "客户端", resource: "资源", hotfix: "热修复" };
 
   const S = (typeof SITE !== "undefined") ? SITE : {};
-  const patchData = (typeof PATCHES !== "undefined" ? PATCHES : []);
+  const staticData = (typeof PATCHES !== "undefined" ? PATCHES : []);
+  let patchData = staticData.slice(); // 渲染用数据，会被仓库实时数据替换/合并
+
+  // 仓库配置（从 config.js 读取，可改）
+  const REPO = S.repo || { owner: "LvShu2009", name: "patch-download", branch: "main", dir: "patches" };
+  const RAW_BASE = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.name}/${REPO.branch}/`;
 
   // 站点信息
   document.title = S.title || document.title;
@@ -204,6 +221,92 @@
   const fd = document.getElementById("footer-disc");
   if (fd && S.footer) fd.textContent = S.footer;
   if (S.show_guide === false) document.getElementById("guide").style.display = "none";
+
+  // 文件指纹：从 URL / 路径里取文件名，用于把仓库文件和静态清单匹配
+  function fileNameOf(str) {
+    try { return decodeURIComponent(String(str).split("/").pop().split("?")[0]); }
+    catch (e) { return String(str).split("/").pop().split("?")[0]; }
+  }
+  function fmtBytes(n) {
+    if (!n && n !== 0) return "";
+    if (n < 1024) return n + " B";
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+    return (n / 1024 / 1024).toFixed(2) + " MB";
+  }
+
+  // 从 GitHub 仓库实时读取文件，与静态清单合并后重新渲染
+  async function syncFromRepo() {
+    const bar = document.getElementById("sync-bar");
+    const txt = document.getElementById("sync-text");
+    bar.className = "sync-bar loading"; txt.textContent = "正在从仓库同步最新补丁列表…";
+    try {
+      const treeUrl = `https://api.github.com/repos/${REPO.owner}/${REPO.name}/git/trees/${encodeURIComponent(REPO.branch)}?recursive=1`;
+      const res = await fetch(treeUrl, { headers: { "Accept": "application/vnd.github+json" } });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (data.truncated) throw new Error("仓库文件过多，列表被截断");
+
+      const dir = (REPO.dir || "").replace(/^\/+|\/+$/g, "");
+      // 仓库里的补丁文件：path 形如 patches/分类/文件名 或 patches/文件名
+      const blobs = (data.tree || []).filter(x => x.type === "blob" &&
+        x.path.startsWith(dir ? dir + "/" : "") && x.path.toLowerCase() !== "readme.md");
+
+      // 用文件名建立静态清单索引（含标题/简介/日期/更新内容）
+      const staticByName = {};
+      staticData.forEach(p => { staticByName[fileNameOf(p.url)] = p; });
+
+      const merged = [];
+      blobs.forEach(b => {
+        const parts = b.path.split("/");
+        let category, fn;
+        if (dir) {
+          const rest = parts.slice(1); // 去掉 patches
+          if (rest.length >= 2) { category = rest[0]; fn = rest.slice(1).join("/"); }
+          else { category = "未分类"; fn = rest[0]; } // patches 根目录文件
+        } else {
+          category = parts.length >= 2 ? parts[0] : "未分类";
+          fn = parts.length >= 2 ? parts.slice(1).join("/") : parts[0];
+        }
+        const fileName = fileNameOf(fn);
+        const meta = staticByName[fileName];
+        const encPath = b.path.split("/").map(encodeURIComponent).join("/");
+        const raw = RAW_BASE + encPath;
+        if (meta) {
+          // 静态清单里有：保留全部介绍信息，链接换成自己的 raw 源
+          merged.push(Object.assign({}, meta, { category: category, url: raw, source: "github", _auto: true }));
+        } else {
+          // 仓库里新加、清单里没有：自动生成条目
+          merged.push({
+            title: fileName,
+            summary: "仓库新增补丁",
+            size: fmtBytes(b.size),
+            date: new Date().toISOString().slice(0, 10),
+            url: raw,
+            source: "github",
+            changes: ["新增补丁文件"],
+            category: category,
+            _auto: true, _new: true
+          });
+        }
+      });
+
+      // 静态清单里是镜像源（仓库中不存在）的条目仍保留，保证失效的那个还能显示
+      const repoNames = new Set(blobs.map(b => fileNameOf(b.path)));
+      staticData.forEach(p => {
+        if (p.source !== "github" && !repoNames.has(fileNameOf(p.url))) merged.push(p);
+      });
+
+      patchData = merged;
+      const newCount = merged.filter(p => p._new).length;
+      route(); // 用新数据重新渲染当前视图
+      bar.className = "sync-bar ok";
+      txt.textContent = "已同步仓库：共 " + merged.length + " 个补丁" +
+        (newCount ? "（含 " + newCount + " 个新增）" : "") + " · 自动更新已开启";
+    } catch (e) {
+      bar.className = "sync-bar err";
+      txt.textContent = "同步失败（" + e.message + "），显示本地清单";
+    }
+  }
 
   function byCat() {
     const g = {};
@@ -255,9 +358,9 @@
     list.forEach(p => {
       const ext = (p.url.split(".").pop() || "zip").toUpperCase().slice(0, 4);
       const isGithub = p.source === "github";
-      const srcTag = isGithub
-        ? `<span class="src-tag mine">本地源</span>`
-        : `<span class="src-tag mirror">镜像源</span>`;
+      const srcTag = p._new
+        ? `<span class="src-tag auto">新增</span>`
+        : (isGithub ? `<span class="src-tag mine">本地源</span>` : `<span class="src-tag mirror">镜像源</span>`);
       const row = document.createElement("div");
       row.className = "file-row";
       row.innerHTML = `
@@ -296,8 +399,11 @@
   }
 
   document.getElementById("crumb-back").addEventListener("click", () => { location.hash = "#/"; });
+  document.getElementById("sync-refresh").addEventListener("click", syncFromRepo);
   window.addEventListener("hashchange", route);
   route();
+  // 页面加载后自动从仓库同步（失败时保留本地清单，不影响使用）
+  syncFromRepo();
 </script>
 </body>
 </html>
