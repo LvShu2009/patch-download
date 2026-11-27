@@ -251,14 +251,35 @@
       const metaFile = (REPO.meta || (dir ? dir + "/meta.json" : "meta.json"));
       // 先把描述文件读进来（读取失败不影响主流程，按默认描述显示）
       let metaMap = {};
+      let metaSource = "";
+      const encMeta = metaFile.split("/").map(encodeURIComponent).join("/");
+      // 方式1：优先用 GitHub API 读（国内网络通常比 raw 稳，返回 base64 内容）
       try {
-        const encMeta = metaFile.split("/").map(encodeURIComponent).join("/");
-        const mr = await fetch(RAW_BASE + encMeta + "?t=" + Date.now(), { cache: "no-store" });
-        if (mr.ok) {
-          const mj = await mr.json();
-          if (mj && typeof mj === "object" && !Array.isArray(mj)) metaMap = mj;
+        const apiUrl = `https://api.github.com/repos/${REPO.owner}/${REPO.name}/contents/${encMeta}` +
+          `?ref=${encodeURIComponent(REPO.branch)}&t=${Date.now()}`;
+        const ar = await fetch(apiUrl, { headers: { "Accept": "application/vnd.github+json" }, cache: "no-store" });
+        if (ar.ok) {
+          const aj = await ar.json();
+          if (aj && aj.content) {
+            // base64 → UTF-8（中文安全）
+            const bin = atob(String(aj.content).replace(/\s/g, ""));
+            const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+            const txt = new TextDecoder().decode(bytes);
+            const mj = JSON.parse(txt);
+            if (mj && typeof mj === "object" && !Array.isArray(mj)) { metaMap = mj; metaSource = "api"; }
+          }
         }
       } catch (e) {}
+      // 方式2：API 失败再退回 raw
+      if (!Object.keys(metaMap).length) {
+        try {
+          const mr = await fetch(RAW_BASE + encMeta + "?t=" + Date.now(), { cache: "no-store" });
+          if (mr.ok) {
+            const mj = await mr.json();
+            if (mj && typeof mj === "object" && !Array.isArray(mj)) { metaMap = mj; metaSource = "raw"; }
+          }
+        } catch (e) {}
+      }
       // 按「完整路径」或「文件名」两种 key 查描述（兼容上传工具与手动填写）
       function descFor(path, fileName) {
         return metaMap[path] || metaMap[fileName] || null;
@@ -337,7 +358,10 @@
       bar.className = "sync-bar ok";
       txt.textContent = "已同步仓库：共 " + merged.length + " 个补丁" +
         (newCount ? "（含 " + newCount + " 个新增）" : "") +
-        " · 描述已同步" + (descCount ? "（" + descCount + " 条自定义）" : "") + " · 自动更新已开启";
+        (descCount
+          ? " · 描述已同步（" + descCount + " 条自定义" + (metaSource ? "，来源 " + metaSource : "") + "）"
+          : " · 未读到自定义描述（检查 patches/meta.json 是否可访问）") +
+        " · 自动更新已开启";
     } catch (e) {
       bar.className = "sync-bar err";
       txt.textContent = "同步失败（" + e.message + "），显示本地清单";
