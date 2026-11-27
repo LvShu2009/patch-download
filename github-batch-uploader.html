@@ -152,6 +152,19 @@
   .pick-item .fn { font-size: 13px; font-weight: 600; word-break: break-all; }
   .pick-item .fp { font-size: 11px; color: var(--muted); margin-top: 2px; word-break: break-all; }
   .pick-empty { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
+  .btn-danger { background: #d64545; color: #fff; }
+  .btn-danger:hover:not(:disabled) { filter: brightness(1.08); }
+  .del-list { max-height: 52vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border); border-radius: 8px; margin-top: 10px; }
+  .del-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+  .del-item:last-child { border-bottom: none; }
+  .del-item:hover { background: rgba(214,69,69,.08); }
+  .del-item input[type=checkbox] { margin-top: 3px; width: 16px; height: 16px; accent-color: #d64545; flex: none; }
+  .del-item .di-body { min-width: 0; }
+  .del-item .di-fn { font-size: 13px; font-weight: 600; word-break: break-all; }
+  .del-item .di-fp { font-size: 11px; color: var(--muted); margin-top: 2px; word-break: break-all; }
+  .del-toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
   @media (max-width: 620px) { .grid, .choices { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -344,6 +357,37 @@
         • 只有真正上传/更新的文件才产生 commit，跳过的不会；遇到限流（403/429）会自动等待重试。<br>
         • 成功后日志给出每个文件的独立链接：点开即单文件页面 / 原始文件地址（raw.githubusercontent.com），方便单独调用。<br>
         • <b>描述同步</b>：第 3 步填的描述会写进仓库的 <code>patches/meta.json</code>，网站打开时读取它显示你写的标题/简介/更新内容。留空字段不覆盖原有描述；描述文件的内容没变化不会产生多余提交。
+      </p>
+    </details>
+  </div>
+
+  <!-- 删除仓库文件 -->
+  <div class="card">
+    <h2><span class="num">5</span>删除仓库文件 / 文件夹（传错了用它）</h2>
+    <div class="meta-tip">
+      传错的文件或整个文件夹在这里删。列表按<b>文件夹分组</b>，勾选一个文件夹 = 删掉它下面<b>所有文件</b>（含子文件夹），
+      正好用来删「传错位置的整个文件夹」。<b>删除不可撤销</b>，删前务必核对。删除后网站自动同步，数量随之减少。
+    </div>
+    <div class="toolbar top">
+      <button class="btn btn-ghost btn-sm" id="delLoadBtn" type="button">🔄 加载仓库文件</button>
+      <button class="btn btn-ghost btn-sm" id="delAllBtn" type="button">全选</button>
+      <button class="btn btn-ghost btn-sm" id="delNoneBtn" type="button">全不选</button>
+      <span class="progress-text" id="delStatus"></span>
+    </div>
+    <input type="text" id="delSearch" placeholder="🔍 输入关键词筛选，例如：mikufan / 诺斯 / 测试" style="margin-top:10px">
+    <div class="del-list" id="delList"><div class="pick-empty" style="padding:16px">点「加载仓库文件」后，勾选要删除的文件夹或单个文件</div></div>
+    <div class="del-toolbar">
+      <button class="btn btn-danger btn-sm" id="delRunBtn" type="button">🗑 删除选中的（文件夹 / 文件）</button>
+      <span class="hint" id="delCount"></span>
+    </div>
+    <details style="margin-top:12px">
+      <summary>删除说明</summary>
+      <p>
+        • 只删除 <code>patches/</code> 目录下的补丁文件，站点文件（index.html 等）不受影响。<br>
+        • <b>勾选文件夹</b>会删除该文件夹下所有文件（递归含子文件夹）；<b>勾选单个文件</b>只删这一个。<br>
+        • 删除会逐个提交到仓库，文件较多时需要一点时间；删除成功后网站会自动少掉这些文件。<br>
+        • 若文件同时有描述（meta.json 里的条目），会一并清理，避免残留。<br>
+        • 误删可在 GitHub 仓库的 Commits 里找到对应提交，点「Revert」恢复（需一定的 Git 操作）。
       </p>
     </details>
   </div>
@@ -1089,6 +1133,195 @@
       log('本次未填写描述，仓库里的 ' + metaPath() + ' 保持不变。', 'info');
     }
     btn.disabled = false;
+  };
+
+  // ---------- 删除仓库文件 / 文件夹 ----------
+  let delItems = []; // 仓库里的补丁文件 [{path, sha, size}]
+  let delFolders = []; // 提取出的文件夹 [{path, count}]
+
+  function loadDelList() {
+    const c = checkCfg(); if (!c) return Promise.reject(new Error('no cfg'));
+    const btn = $('delLoadBtn'); btn.disabled = true;
+    $('delStatus').textContent = '正在读取仓库文件列表…';
+    const treePath = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) +
+      '/git/trees/' + encodeURIComponent(c.branch) + '?recursive=1';
+    return api(treePath, { method: 'GET' }, c).then(res => {
+      if (!res.ok) {
+        let m = 'HTTP ' + res.status;
+        return res.json().then(j => { throw new Error(j.message || m); }).catch(() => { throw new Error(m); });
+      }
+      return res.json();
+    }).then(data => {
+      if (data.truncated) throw new Error('仓库文件太多，列表被截断，无法完整删除');
+      const dir = c.dir;
+      delItems = (data.tree || []).filter(x =>
+        x.type === 'blob' &&
+        x.path.startsWith(dir ? dir + '/' : '') &&
+        !x.path.toLowerCase().endsWith('/meta.json') && x.path !== 'meta.json'
+      ).map(x => ({ path: x.path, sha: x.sha, size: x.size || 0 }));
+
+      // 从文件路径提取文件夹（patches/ 之下的每一级），统计每个文件夹下的文件数
+      const folderMap = {};
+      delItems.forEach(it => {
+        const segs = it.path.split('/');
+        segs.pop(); // 去掉文件名
+        for (let i = 1; i <= segs.length; i++) {
+          const fp = segs.slice(0, i).join('/');
+          if (!fp) continue;
+          folderMap[fp] = (folderMap[fp] || 0) + 1;
+        }
+      });
+      delFolders = Object.keys(folderMap).map(p => ({ path: p, count: folderMap[p] }))
+        .sort((a, b) => a.path.localeCompare(b.path));
+      renderDelList('');
+      $('delStatus').textContent = '已加载 ' + delItems.length + ' 个文件 / ' + delFolders.length + ' 个文件夹';
+      log('删除列表已加载：' + delItems.length + ' 个文件，' + delFolders.length + ' 个文件夹。', 'ok');
+    }).catch(e => {
+      $('delStatus').textContent = '加载失败';
+      log('加载删除列表失败：' + e.message, 'err');
+    }).then(() => { btn.disabled = false; });
+  }
+
+  // 勾选某个「文件夹」时，选中/取消它下面所有文件
+  function toggleFolder(folderPath, checked) {
+    delItems.forEach(it => {
+      if (it.path === folderPath || it.path.startsWith(folderPath + '/')) it._del = checked;
+    });
+  }
+  // 某个文件夹下的文件是否全被勾选
+  function folderAllChecked(folderPath) {
+    const children = delItems.filter(it => it.path === folderPath || it.path.startsWith(folderPath + '/'));
+    return children.length > 0 && children.every(it => it._del);
+  }
+
+  function renderDelList(keyword) {
+    const box = $('delList');
+    const kw = (keyword || '').trim().toLowerCase();
+    const folders = delFolders.filter(f => !kw || f.path.toLowerCase().indexOf(kw) >= 0);
+    const looseFiles = delItems.filter(it => !kw || it.path.toLowerCase().indexOf(kw) >= 0);
+    let html = '';
+    if (folders.length) {
+      html += '<div style="font-size:11px;color:var(--muted);padding:8px 12px 4px">📁 文件夹（勾选 = 删除整文件夹及其子内容）</div>';
+      html += folders.map(f => {
+        const checked = folderAllChecked(f.path);
+        return '<label class="del-item" data-folder="' + escHtml(f.path) + '">' +
+          '<input type="checkbox" ' + (checked ? 'checked' : '') + '>' +
+          '<div class="di-body"><div class="di-fn">📁 ' + escHtml(f.path) + '</div>' +
+          '<div class="di-fp">含 ' + f.count + ' 个文件 · 勾选将全部删除</div></div></label>';
+      }).join('');
+    }
+    html += '<div style="font-size:11px;color:var(--muted);padding:10px 12px 4px">📄 单个文件（可单独勾选）</div>';
+    html += looseFiles.map((it, i) =>
+      '<label class="del-item" data-file="' + escHtml(it.path) + '">' +
+      '<input type="checkbox" ' + (it._del ? 'checked' : '') + '>' +
+      '<div class="di-body"><div class="di-fn">' + escHtml(fileNameOf(it.path)) + '</div>' +
+      '<div class="di-fp">' + escHtml(it.path) + ' · ' + fmtSize(it.size) + '</div></div></label>'
+    ).join('');
+    if (!folders.length && !looseFiles.length) html = '<div class="pick-empty">没有匹配的内容</div>';
+    box.innerHTML = html;
+
+    box.querySelectorAll('[data-folder]').forEach(el => {
+      const fp = el.getAttribute('data-folder');
+      const cb = el.querySelector('input');
+      cb.onchange = () => { toggleFolder(fp, cb.checked); updateDelCount(); syncFolderChecks(); };
+    });
+    box.querySelectorAll('[data-file]').forEach(el => {
+      const p = el.getAttribute('data-file');
+      const cb = el.querySelector('input');
+      cb.onchange = () => {
+        const it = delItems.find(x => x.path === p);
+        if (it) it._del = cb.checked;
+        updateDelCount(); syncFolderChecks();
+      };
+    });
+    updateDelCount();
+  }
+
+  // 勾选单个文件后，同步上层文件夹复选框的状态
+  function syncFolderChecks() {
+    document.querySelectorAll('#delList [data-folder]').forEach(el => {
+      const fp = el.getAttribute('data-folder');
+      el.querySelector('input').checked = folderAllChecked(fp);
+    });
+  }
+
+  function updateDelCount() {
+    const n = delItems.filter(it => it._del).length;
+    $('delCount').textContent = n ? '已选 ' + n + ' 个文件' : '';
+  }
+
+  $('delLoadBtn').onclick = () => { loadDelList(); };
+  $('delSearch').oninput = e => renderDelList(e.target.value);
+  $('delAllBtn').onclick = () => {
+    const kw = ($('delSearch').value || '').trim().toLowerCase();
+    delItems.forEach(it => { if (!kw || it.path.toLowerCase().indexOf(kw) >= 0) it._del = true; });
+    renderDelList($('delSearch').value);
+  };
+  $('delNoneBtn').onclick = () => { delItems.forEach(it => { it._del = false; }); renderDelList($('delSearch').value); };
+
+  $('delRunBtn').onclick = async () => {
+    const c = checkCfg(); if (!c) return;
+    const selected = delItems.filter(it => it._del);
+    if (!selected.length) { alert('请先勾选要删除的文件夹或文件'); return; }
+    const folderCount = delFolders.filter(f => folderAllChecked(f.path)).length;
+    const msg = '确定删除选中的 ' + selected.length + ' 个文件' +
+      (folderCount ? '（含 ' + folderCount + ' 个完整文件夹）' : '') + ' 吗？\n\n' +
+      '删除后网站会自动去掉这些补丁，操作不可撤销。';
+    if (!confirm(msg)) return;
+
+    const btn = $('delRunBtn'); btn.disabled = true;
+    let ok = 0, fail = 0;
+    log('开始删除 ' + selected.length + ' 个文件…', 'info');
+    for (let i = 0; i < selected.length; i++) {
+      const it = selected[i];
+      try {
+        const enc = it.path.split('/').map(encodeURIComponent).join('/');
+        const url = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/contents/' + enc;
+        const body = { message: 'delete wrongly uploaded file: ' + fileNameOf(it.path), sha: it.sha, branch: c.branch };
+        const res = await api(url, {
+          method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+        }, c);
+        if (res.ok || res.status === 200 || res.status === 204) {
+          ok++; log('✓ 已删除 ' + it.path, 'info');
+        } else {
+          let m = 'HTTP ' + res.status;
+          try { const j = await res.json(); m = j.message || m; } catch (e) {}
+          // 404 视为已不在仓库，也算删除成功
+          if (res.status === 404) { ok++; log('= 文件已不存在 ' + it.path, 'info'); }
+          else { fail++; log('✗ 删除失败 ' + it.path + '：' + m, 'err'); }
+        }
+      } catch (e) { fail++; log('✗ 删除失败 ' + it.path + '：' + e.message, 'err'); }
+      $('delStatus').textContent = '删除中 ' + (i + 1) + '/' + selected.length;
+    }
+
+    // 清理 meta.json 里对应的描述条目（key 以被删文件完整路径或文件名匹配）
+    if (ok) {
+      try {
+        const cur = await readMeta(c);
+        const data = cur.data;
+        const deletedPaths = new Set(selected.map(x => x.path));
+        const deletedNames = new Set(selected.map(x => fileNameOf(x.path)));
+        let removed = 0;
+        Object.keys(data).forEach(k => {
+          const kn = fileNameOf(k);
+          if (deletedPaths.has(k) || deletedNames.has(kn) || selected.some(x => k === x.path)) { delete data[k]; removed++; }
+        });
+        if (removed && cur.sha) {
+          const enc = metaPath().split('/').map(encodeURIComponent).join('/');
+          const url = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) + '/contents/' + enc;
+          const body = { message: 'clean descriptions for deleted files', content: utf8ToBase64(JSON.stringify(data, null, 2) + '\n'), sha: cur.sha, branch: c.branch };
+          const res = await api(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, c);
+          if (res.ok) log('✓ 已清理 ' + removed + ' 条对应描述', 'ok');
+          else log('描述清理失败（不影响文件删除）', 'err');
+        }
+      } catch (e) { log('描述清理跳过：' + e.message, 'info'); }
+    }
+
+    log('删除完成：成功 ' + ok + ' 个，失败 ' + fail + ' 个。网站刷新后自动生效。', fail ? 'err' : 'ok');
+    $('delStatus').textContent = '删除完成：成功 ' + ok + '，失败 ' + fail;
+    btn.disabled = false;
+    // 删除后重新加载列表，避免误操作
+    if (ok) loadDelList();
   };
 
   // ---------- 配置记忆按钮 ----------
