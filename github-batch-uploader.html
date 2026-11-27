@@ -142,6 +142,16 @@
   .modal h3 { font-size: 16px; margin-bottom: 4px; }
   .modal .sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; word-break: break-all; }
   .modal .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  /* 可滚动、可点击选择的文件列表 */
+  .pick-list { max-height: 56vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border); border-radius: 8px; margin-top: 10px; }
+  .pick-item { padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+  .pick-item:last-child { border-bottom: none; }
+  .pick-item:hover, .pick-item:active { background: rgba(108,140,255,.14); }
+  .pick-item .idx { color: var(--accent); font-size: 11px; font-weight: 700; margin-right: 6px; }
+  .pick-item .fn { font-size: 13px; font-weight: 600; word-break: break-all; }
+  .pick-item .fp { font-size: 11px; color: var(--muted); margin-top: 2px; word-break: break-all; }
+  .pick-empty { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; }
   @media (max-width: 620px) { .grid, .choices { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -277,11 +287,23 @@
         <label>更新内容（一行一条，展开后显示）</label>
         <textarea id="globalChanges" class="changes-input" placeholder="新增静态去衣补丁&#10;下载解压后覆盖到游戏对应目录生效"></textarea>
       </div>
+      <div class="field full">
+        <label>这段描述对应哪个补丁文件？<span class="req">*</span>（仅「上传描述」时需要）</label>
+        <div class="token-row">
+          <input type="text" id="descTarget" placeholder="patches/Zn的补丁/诺斯III号音速少女去衣补丁（静态）.zip">
+          <button class="btn btn-ghost btn-sm" id="pickFileBtn" type="button" title="从仓库里的补丁文件中选择">📂 选文件</button>
+        </div>
+        <div class="hint">填仓库里的完整路径（含 patches/ 和分类），可用「📂 选文件」从仓库列表里挑。网站的匹配就靠它。</div>
+      </div>
     </div>
     <div class="toolbar top">
+      <button class="btn btn-primary btn-sm" id="uploadDescBtn" type="button">📤 上传描述到仓库</button>
       <button class="btn btn-ghost btn-sm" id="pullMetaBtn" type="button">↓ 拉取已有描述</button>
       <button class="btn btn-ghost btn-sm" id="clearMetaBtn" type="button">清空描述表单</button>
       <span class="progress-text" id="metaStatus"></span>
+    </div>
+    <div class="hint" style="margin-top:8px">
+      <b>怎么区分：</b>「📤 上传描述」= 把你上面填的写进仓库（填好描述点它即可，不用重新传补丁文件）；「↓ 拉取已有描述」= 把仓库里已有的读回来。第一次用时仓库没有描述文件，拉取显示 0 条是正常的。
     </div>
   </div>
 
@@ -342,6 +364,10 @@
     return new TextDecoder().decode(arr);
   }
   function metaPath() { return ($('metaPath').value.trim() || META_PATH_DEFAULT).replace(/^\/+|\/+$/g, ''); }
+  function escHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
 
   function fmtSize(bytes) {
     if (bytes < 1024) return bytes + ' B';
@@ -368,7 +394,7 @@
   // ---------- 配置记忆（localStorage + 文件导入导出）----------
   const CFG_KEY = 'gh_batch_uploader_cfg_v1';
   const CFG_FIELDS = ['token', 'owner', 'repo', 'branch', 'dir', 'metaPath',
-    'globalTitle', 'globalSummary', 'globalCategory', 'globalDate', 'globalChanges'];
+    'globalTitle', 'globalSummary', 'globalCategory', 'globalDate', 'globalChanges', 'descTarget'];
 
   function setSaveStatus(text, cls) {
     const el = $('saveStatus');
@@ -836,7 +862,7 @@
   $('clearMetaBtn').onclick = () => {
     $('globalTitle').value = ''; $('globalSummary').value = '';
     $('globalCategory').value = ''; $('globalDate').value = '';
-    $('globalChanges').value = '';
+    $('globalChanges').value = ''; $('descTarget').value = '';
     files.forEach(f => { f.meta = null; });
     $('metaStatus').textContent = ''; render();
   };
@@ -847,6 +873,16 @@
     $('pullMetaBtn').disabled = true; $('metaStatus').textContent = '拉取中…';
     try {
       const { data } = await readMeta(c);
+      // 若指定了目标文件，把它的描述填回表单，方便查看/修改
+      const target = $('descTarget').value.trim().replace(/^\/+|\/+$/g, '');
+      if (target && data[target]) {
+        const m = data[target];
+        applyConfig({
+          globalTitle: m.title || '', globalSummary: m.summary || '',
+          globalCategory: m.category || '', globalDate: m.date || '',
+          globalChanges: (m.changes || []).join('\n')
+        });
+      }
       let hit = 0;
       files.forEach(it => {
         const byPath = data[metaKey(it)];
@@ -855,14 +891,110 @@
         if (m) { it.meta = Object.assign({}, m); hit++; }
       });
       const count = Object.keys(data).length;
-      $('metaStatus').textContent = '已拉取 ' + count + ' 条描述' + (files.length ? '，匹配到本批 ' + hit + ' 个文件' : '');
-      log('拉取描述成功：' + count + ' 条' + (files.length ? '，已匹配 ' + hit + ' 个文件' : '（先选文件可自动填充）'), 'ok');
+      if (count === 0) {
+        $('metaStatus').textContent = '仓库里还没有描述文件（正常，首次使用）';
+        log('仓库里还没有 ' + metaPath() + '。请先填好描述并点「📤 上传描述到仓库」。', 'info');
+      } else {
+        $('metaStatus').textContent = '已拉取 ' + count + ' 条描述' + (files.length ? '，匹配到本批 ' + hit + ' 个文件' : '');
+        log('拉取描述成功：' + count + ' 条' + (files.length ? '，已匹配 ' + hit + ' 个文件' : '（填 descTarget 可查看指定文件的描述）'), 'ok');
+      }
       render();
     } catch (e) {
       $('metaStatus').textContent = '拉取失败';
       log('拉取描述失败：' + e.message, 'err');
     }
     $('pullMetaBtn').disabled = false;
+  };
+
+  // 仅上传描述：把表单里填的描述写到 descTarget 指定的补丁文件
+  $('uploadDescBtn').onclick = async () => {
+    const c = checkCfg(); if (!c) return;
+    const target = $('descTarget').value.trim().replace(/^\/+|\/+$/g, '');
+    if (!target) {
+      alert('请填写「这段描述对应哪个补丁文件」，或点「📂 选文件」从仓库里挑一个。');
+      $('descTarget').focus(); return;
+    }
+    const g = globalMeta();
+    if (!Object.keys(g).length) { alert('请至少填写一项描述内容（标题/简介/更新内容等）。'); return; }
+    const btn = $('uploadDescBtn'); btn.disabled = true;
+    $('metaStatus').textContent = '上传中…';
+    try {
+      const r = await writeMeta(c, { [target]: g });
+      if (r.skipped) {
+        $('metaStatus').textContent = '描述内容无变化，未重复提交';
+        log('= 描述与仓库里一致，无需更新', 'info');
+      } else {
+        $('metaStatus').textContent = '✓ 已上传描述（共 ' + r.count + ' 条）';
+        log('✓ 描述已写入 ' + metaPath() + '：' + target, 'ok');
+        log('  网站同步后即显示你写的标题/简介/更新内容（约几分钟，刷新加 ?t= 可立即看到）', 'info');
+      }
+    } catch (e) {
+      $('metaStatus').textContent = '上传失败';
+      log('✗ 上传描述失败：' + e.message, 'err');
+    }
+    btn.disabled = false;
+  };
+
+  // 从仓库拉取补丁文件列表，供选择描述目标
+  $('pickFileBtn').onclick = async () => {
+    const c = checkCfg(); if (!c) return;
+    const btn = $('pickFileBtn'); btn.disabled = true;
+    $('metaStatus').textContent = '正在读取仓库文件列表…';
+    try {
+      const treePath = 'repos/' + encodeURIComponent(c.owner) + '/' + encodeURIComponent(c.repo) +
+        '/git/trees/' + encodeURIComponent(c.branch) + '?recursive=1';
+      const res = await api(treePath, { method: 'GET' }, c);
+      if (!res.ok) { let m = 'HTTP ' + res.status; try { const j = await res.json(); m = j.message || m; } catch (e) {} throw new Error(m); }
+      const data = await res.json();
+      const dir = c.dir;
+      const filesInRepo = (data.tree || [])
+        .filter(x => x.type === 'blob' && x.path.startsWith(dir ? dir + '/' : '') &&
+          !x.path.toLowerCase().endsWith('/meta.json') && x.path !== 'meta.json')
+        .map(x => x.path).sort();
+      if (!filesInRepo.length) { throw new Error('仓库 ' + (dir || '根目录') + ' 下没找到补丁文件'); }
+      // 用自定义可滚动列表替代 prompt（手机上 prompt 内容过长无法滚动）
+      const mask = document.createElement('div');
+      mask.className = 'modal-mask';
+      mask.innerHTML = `
+        <div class="modal">
+          <h3>选择要写描述的补丁</h3>
+          <div class="sub">共 ${filesInRepo.length} 个文件 · 点一下即选中，可上下滑动</div>
+          <input type="text" id="pickSearch" placeholder="🔍 输入关键词筛选，例如：诺斯 / 静态 / Zn">
+          <div class="pick-list" id="pickList"></div>
+          <div class="actions"><button class="btn btn-ghost btn-sm" id="pickCancel">取消</button></div>
+        </div>`;
+      document.body.appendChild(mask);
+      const listEl = $('pickList');
+      function renderList(keyword) {
+        const kw = (keyword || '').trim().toLowerCase();
+        const matched = filesInRepo.map((p, i) => ({ p, i }))
+          .filter(x => !kw || x.p.toLowerCase().indexOf(kw) >= 0);
+        if (!matched.length) { listEl.innerHTML = '<div class="pick-empty">没有匹配的文件</div>'; return; }
+        listEl.innerHTML = matched.map(x => `
+          <div class="pick-item" data-path="${escHtml(x.p)}">
+            <div class="fn"><span class="idx">${x.i + 1}.</span>${escHtml(fileNameOf(x.p))}</div>
+            <div class="fp">${escHtml(x.p)}</div>
+          </div>`).join('');
+        listEl.querySelectorAll('.pick-item').forEach(el => {
+          el.onclick = () => {
+            const path = el.getAttribute('data-path');
+            $('descTarget').value = path;
+            $('metaStatus').textContent = '已选择：' + path;
+            log('已选择目标补丁：' + path, 'info');
+            mask.remove();
+          };
+        });
+      }
+      renderList('');
+      $('pickSearch').oninput = e => renderList(e.target.value);
+      $('pickCancel').onclick = () => { mask.remove(); $('metaStatus').textContent = '已取消选择'; };
+      mask.onclick = e => { if (e.target === mask) { mask.remove(); $('metaStatus').textContent = '已取消选择'; } };
+      $('metaStatus').textContent = '请选择要写描述的补丁（' + filesInRepo.length + ' 个）';
+    } catch (e) {
+      $('metaStatus').textContent = '读取失败';
+      log('读取仓库文件列表失败：' + e.message, 'err');
+    }
+    btn.disabled = false;
   };
 
   $('testBtn').onclick = async () => {
