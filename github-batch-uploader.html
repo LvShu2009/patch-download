@@ -233,13 +233,18 @@
       <button class="choice" id="chooseFolderBtn" type="button">
         <span class="ico">📁</span>
         <span class="t">选择整个文件夹</span>
-        <span class="d">保留文件夹内所有层级结构（含最外层文件夹名）。适合按"作者/分类"整包上传，仓库会自动生成同名文件夹。建议电脑上操作。</span>
+        <span class="d">保留文件夹内所有层级结构。⚠️ 仅电脑浏览器支持；手机上点它只会变成选单个文件，请改用右边的方式。</span>
       </button>
       <button class="choice" id="chooseFilesBtn" type="button">
         <span class="ico">📄</span>
-        <span class="t">选择多个文件（平铺）</span>
-        <span class="d">只上传选中的文件本身，不带目录结构，直接放到上面的目标目录。也可把文件拖拽到下方。</span>
+        <span class="t">选择多个文件（手机推荐）</span>
+        <span class="d">进到目标文件夹后长按多选所有文件，配上下面填的「子文件夹」，效果等于上传整个文件夹。电脑上也可拖拽。</span>
       </button>
+    </div>
+    <div class="field full" style="margin-top:14px">
+      <label>这批文件放进哪个子文件夹？（可选，手机上用它替代"整个文件夹"）</label>
+      <input type="text" id="subDir" placeholder="例如：mikufan的补丁（留空 = 直接放进上面的目标目录）">
+      <div class="hint">手机传整个文件夹的方法：① 点上面「选择多个文件」→ ② 进到该文件夹，长按文件多选全部 zip → ③ 这里填文件夹名（如 <code>mikufan的补丁</code>）→ ④ 上传。仓库会自动生成 <code>目标目录/子文件夹/文件.zip</code>，效果和整包上传一样，不重复建文件夹。</div>
     </div>
     <div class="dropzone" id="dropzone">把文件拖拽到这里（平铺上传）</div>
     <input type="file" id="fileInput" multiple hidden>
@@ -393,7 +398,7 @@
 
   // ---------- 配置记忆（localStorage + 文件导入导出）----------
   const CFG_KEY = 'gh_batch_uploader_cfg_v1';
-  const CFG_FIELDS = ['token', 'owner', 'repo', 'branch', 'dir', 'metaPath',
+  const CFG_FIELDS = ['token', 'owner', 'repo', 'branch', 'dir', 'subDir', 'metaPath',
     'globalTitle', 'globalSummary', 'globalCategory', 'globalDate', 'globalChanges', 'descTarget'];
 
   function setSaveStatus(text, cls) {
@@ -531,18 +536,27 @@
     return file.arrayBuffer().then(buf => gitBlobSha(buf));
   }
 
-  // 目标目录变化时，刷新每个文件最终仓库路径
-  function refreshPaths() {
+  // 计算文件最终仓库路径 = 目标目录 / 子文件夹 / 相对路径
+  function buildPath(rel) {
     const d = cfg().dir;
-    files.forEach(it => { it.path = d ? d + '/' + it.rel : it.rel; });
+    const sub = ($('subDir') ? $('subDir').value.trim() : '').replace(/^\/+|\/+$/g, '');
+    const parts = [];
+    if (d) parts.push(d);
+    if (sub) parts.push(sub);
+    if (rel) parts.push(rel);
+    return parts.join('/');
+  }
+
+  // 目标目录/子文件夹变化时，刷新每个文件最终仓库路径
+  function refreshPaths() {
+    files.forEach(it => { it.path = buildPath(it.rel); });
   }
 
   function addFiles(fileArr, keepStructure) {
     fileArr.forEach(f => {
       let rel = f.name;
       if (keepStructure && f.webkitRelativePath) rel = f.webkitRelativePath;
-      const d = cfg().dir;
-      files.push({ file: f, rel: rel, path: d ? d + '/' + rel : rel, status: '等待', meta: null });
+      files.push({ file: f, rel: rel, path: buildPath(rel), status: '等待', meta: null });
     });
     render();
   }
@@ -658,8 +672,7 @@
     });
     const total = files.reduce((s, i) => s + i.file.size, 0);
     $('fileSummary').textContent = '共 ' + files.length + ' 个文件，' + fmtSize(total);
-    const d = cfg().dir;
-    $('dirSummary').textContent = files.length ? '(将传到 ' + (d || '仓库根目录') + ')' : '';
+    $('dirSummary').textContent = files.length ? '(将传到 ' + (files[0].path.split('/').slice(0, -1).join('/') || '仓库根目录') + ')' : '';
   }
 
   // ---------- 描述编辑 ----------
@@ -681,10 +694,8 @@
     return m;
   }
   function metaKey(item) {
-    // 用仓库相对路径做 key，同时兼容网站按文件名查找
-    const d = cfg().dir;
-    let rel = item.rel;
-    return d ? d + '/' + rel : rel;
+    // 用仓库相对路径做 key（含子文件夹），与网站按路径/文件名查找一致
+    return buildPath(item.rel);
   }
   function fileNameOf(path) { return decodeURIComponent(String(path).split('/').pop().split('?')[0]); }
 
@@ -796,8 +807,21 @@
   }
 
   // ---------- 事件 ----------
-  $('chooseFolderBtn').onclick = () => $('folderInput').click();
+  // 手机上 webkitdirectory 不被支持，点"选择整个文件夹"会退化成选单个文件——给出引导
+  $('chooseFolderBtn').onclick = () => {
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    if (isMobile) {
+      if (confirm('手机浏览器不支持"整个文件夹"选择（会变成选单个文件）。\n\n推荐做法：点「确定」改用「选择多个文件」——进到目标文件夹后长按多选全部文件，再填「子文件夹」名，效果一样。\n\n点「取消」仍要尝试原方式。')) {
+        $('fileInput').click();
+      } else {
+        $('folderInput').click();
+      }
+    } else {
+      $('folderInput').click();
+    }
+  };
   $('chooseFilesBtn').onclick = () => $('fileInput').click();
+  $('subDir').oninput = () => { refreshPaths(); render(); };
   $('dropzone').onclick = () => $('fileInput').click();
   $('dropzone').ondragover = e => { e.preventDefault(); $('dropzone').classList.add('drag'); };
   $('dropzone').ondragleave = () => $('dropzone').classList.remove('drag');
