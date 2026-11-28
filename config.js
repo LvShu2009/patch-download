@@ -12,6 +12,13 @@ const SITE = {
     "dir": "patches",
     "meta": "patches/meta.json"
   },
+  // 下载次数统计（Abacus 免费计数服务，基于 Cloudflare，免注册）
+  // enabled: 是否开启；base: 服务地址；namespace: 命名空间（改成不易猜的，避免被刷）
+  "counter": {
+    "enabled": true,
+    "base": "https://abacus.jasoncameron.dev",
+    "namespace": "patchdl-9f3c7a2e"
+  },
   "show_guide": false,
   "guide": [
     {

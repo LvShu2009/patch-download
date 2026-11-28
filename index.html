@@ -53,6 +53,9 @@
   .crumb .back:hover { text-decoration: underline; }
   .crumb .sep { color: #c4c9d6; }
   .crumb .cur { color: var(--text); font-weight: 700; }
+  .cnt-toggle { margin-left: auto; background: var(--card); border: 1px solid var(--border); color: var(--accent); font-size: 12px; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-weight: 600; white-space: nowrap; }
+  .cnt-toggle:hover { background: #f2f5fb; }
+  .cnt-toggle:disabled { opacity: .6; cursor: default; }
 
   /* 首页标题行 */
   .home-head { margin-bottom: 16px; }
@@ -83,7 +86,7 @@
   /* ---------- 文件列表（分类页） ---------- */
   .file-table { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
   .file-head, .file-row {
-    display: grid; grid-template-columns: 1fr 96px 110px 100px; align-items: center; gap: 12px;
+    display: grid; grid-template-columns: 1fr 88px 150px 92px; align-items: center; gap: 10px;
     padding: 12px 18px;
   }
   .file-head { background: #f2f5fb; font-size: 12px; color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border); }
@@ -99,6 +102,9 @@
   .src-tag.mine { background: #e6f7ed; color: #1a8a4a; }
   .src-tag.mirror { background: #f0f2f6; color: #8a9099; }
   .src-tag.auto { background: #fff4e0; color: #b8860b; }
+  .meta-line { display: flex; flex-direction: column; gap: 2px; }
+  .dl-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .dl-count b { color: var(--accent); font-weight: 700; }
   /* 同步状态条 */
   .sync-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted);
     margin-bottom: 14px; padding: 8px 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; }
@@ -146,7 +152,7 @@
     .file-row { grid-template-columns: 1fr auto; grid-template-areas: "name dl" "meta meta"; padding: 12px 14px; }
     .file-row .name { grid-area: name; }
     .file-row .cell.size { display: none; }
-    .file-row .cell.date { grid-area: meta; font-size: 12px; padding-left: 52px; }
+    .file-row .meta-line { grid-area: meta; flex-direction: row; gap: 14px; font-size: 12px; padding-left: 52px; }
     .file-row .dl { grid-area: dl; }
     .file-detail { padding-left: 14px; }
   }
@@ -189,6 +195,7 @@
       <span>首页</span>
       <span class="sep">/</span>
       <span class="cur" id="crumb-cur"></span>
+      <button class="cnt-toggle" id="viewCountsBtn" type="button">📊 查看下载次数</button>
     </div>
     <div class="file-table" id="file-table"></div>
   </div>
@@ -212,6 +219,83 @@
   const REPO = S.repo || { owner: "LvShu2009", name: "patch-download", branch: "main", dir: "patches" };
   const RAW_BASE = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.name}/${REPO.branch}/`;
 
+  /* ---------- 下载次数统计（Abacus / Cloudflare）---------- */
+  const COUNTER = S.counter || { enabled: false };
+  const COUNT_CACHE_KEY = "patchdl_counts_v1";
+  let countCache = {};
+  try { countCache = JSON.parse(localStorage.getItem(COUNT_CACHE_KEY) || "{}"); } catch (e) { countCache = {}; }
+  function counterKey(p) {
+    // Abacus 的 key 只允许 [A-Za-z0-9_\\-.]{3,64}，中文文件名不合法
+    // 用稳定的字符串哈希（FNV-1a 变体）把任意文件名映射成合法 key，保证同一补丁 key 不变
+    const fn = fileNameOf(p.url || "");
+    let h1 = 0x811c9dc5, h2 = 0x01000193;
+    for (let i = 0; i < fn.length; i++) {
+      const c = fn.charCodeAt(i);
+      h1 = Math.imul(h1 ^ c, 0x01000193) >>> 0;
+      h2 = Math.imul(h2 + c + i, 0x85ebca6b) >>> 0;
+    }
+    return "p" + h1.toString(36) + h2.toString(36); // 纯字母数字，长度合规
+  }
+  function saveCountCache() {
+    try { localStorage.setItem(COUNT_CACHE_KEY, JSON.stringify(countCache)); } catch (e) {}
+  }
+  // 本机缓存里有就显示数字，否则显示占位（打开页面不发任何请求）
+  function cachedCount(p) {
+    const key = counterKey(p);
+    const c = countCache[key];
+    return (c && typeof c.n === "number") ? c.n : "—";
+  }
+  // 读取计数（只读，不 +1）；Abacus 的 /get 对不存在的 key 返回 404 → 视为 0
+  async function fetchCount(p) {
+    if (!COUNTER.enabled || !COUNTER.base) return 0;
+    const key = counterKey(p);
+    try {
+      const url = `${COUNTER.base}/get/${encodeURIComponent(COUNTER.namespace || "patchdl")}/${encodeURIComponent(key)}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.status === 404) return 0;
+      if (!res.ok) return 0;
+      const j = await res.json();
+      return (typeof j.value === "number") ? j.value : 0;
+    } catch (e) { return 0; }
+  }
+  // 点击下载时 +1（命中即计数，失败不影响下载）
+  function hitCount(p) {
+    if (!COUNTER.enabled || !COUNTER.base) return;
+    const key = counterKey(p);
+    try {
+      const url = `${COUNTER.base}/hit/${encodeURIComponent(COUNTER.namespace || "patchdl")}/${encodeURIComponent(key)}`;
+      fetch(url, { mode: "cors", keepalive: true })
+        .then(res => res.ok ? res.json() : null)
+        .then(j => {
+          if (j && typeof j.value === "number") {
+            countCache[key] = { n: j.value, t: Date.now() };
+            saveCountCache();
+            document.querySelectorAll(`[data-cnt-key="${CSS.escape(key)}"]`).forEach(el => { el.textContent = j.value; });
+          }
+        })
+        .catch(() => {});
+    } catch (e) {}
+  }
+  // 「查看下载次数」按钮：手动触发，逐个读取当前分类的补丁次数（限速，避免 429）
+  async function viewCounts() {
+    if (!COUNTER.enabled || !COUNTER.base) return;
+    const btn = document.getElementById("viewCountsBtn");
+    const els = Array.from(document.querySelectorAll("#file-table .cnt-val"));
+    if (!els.length) return;
+    if (btn) { btn.disabled = true; btn.textContent = "读取中…"; }
+    for (const el of els) {
+      const key = el.getAttribute("data-cnt-key");
+      const p = patchData.find(x => counterKey(x) === key);
+      if (!p) continue;
+      const n = await fetchCount(p);
+      el.textContent = n;
+      countCache[key] = { n: n, t: Date.now() };
+      saveCountCache();
+      await new Promise(r => setTimeout(r, 360));
+    }
+    if (btn) { btn.disabled = false; btn.textContent = "📊 刷新下载次数"; }
+  }
+
   // 站点信息
   document.title = S.title || document.title;
   document.getElementById("site-subtitle").textContent = S.subtitle || "";
@@ -226,6 +310,10 @@
   function fileNameOf(str) {
     try { return decodeURIComponent(String(str).split("/").pop().split("?")[0]); }
     catch (e) { return String(str).split("/").pop().split("?")[0]; }
+  }
+  function escAttr(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
   function fmtBytes(n) {
     if (!n && n !== 0) return "";
@@ -414,7 +502,7 @@
     list.sort((a, b) => String(b.date).localeCompare(String(a.date)));
     document.getElementById("crumb-cur").textContent = cat;
     const tbl = document.getElementById("file-table");
-    tbl.innerHTML = `<div class="file-head"><span>名称</span><span>大小</span><span>更新时间</span><span>下载</span></div>`;
+    tbl.innerHTML = `<div class="file-head"><span>名称</span><span>大小</span><span>更新 / 下载</span><span>下载</span></div>`;
     list.forEach(p => {
       const ext = (p.url.split(".").pop() || "zip").toUpperCase().slice(0, 4);
       const isGithub = p.source === "github";
@@ -432,8 +520,15 @@
           </div>
         </div>
         <span class="cell size">${p.size}</span>
-        <span class="cell date">${p.date}</span>
+        <span class="meta-line">
+          <span class="cell date">${p.date}</span>
+          <span class="cell dl-count">${COUNTER.enabled ? `<b data-cnt-key="${escAttr(counterKey(p))}" class="cnt-val">${cachedCount(p)}</b> 次` : `—`}</span>
+        </span>
         <span class="dl"><a class="btn dl" href="${p.url}" download>下载</a></span>`;
+      // 不主动发请求：次数只显示本机缓存，点「查看下载次数」或下载后才更新
+      // 点下载按钮时 +1（阻止冒泡，避免展开详情）
+      const dlBtn = row.querySelector("a.btn.dl");
+      if (dlBtn) dlBtn.addEventListener("click", e => { e.stopPropagation(); hitCount(p); });
       const detail = document.createElement("div");
       detail.className = "file-detail";
       detail.innerHTML = `<div class="t">更新内容</div><ul>${p.changes.map(c => `<li>${c}</li>`).join("")}</ul>`;
@@ -459,6 +554,7 @@
   }
 
   document.getElementById("crumb-back").addEventListener("click", () => { location.hash = "#/"; });
+  document.getElementById("viewCountsBtn").addEventListener("click", viewCounts);
   document.getElementById("sync-refresh").addEventListener("click", syncFromRepo);
   window.addEventListener("hashchange", route);
   route();
