@@ -219,6 +219,62 @@
   const REPO = S.repo || { owner: "LvShu2009", name: "patch-download", branch: "main", dir: "patches" };
   const RAW_BASE = `https://raw.githubusercontent.com/${REPO.owner}/${REPO.name}/${REPO.branch}/`;
 
+  /* ---------- Gitee 下载镜像（优先）----------
+     列表仍从 GitHub 读取；但下载时优先走 Gitee（国内快），失败自动回退 GitHub。
+     Gitee 免费版单仓 500MB，补丁按分类拆到 4 个仓库；这里维护「分类 → 仓库」映射。
+     鱼玖的补丁被拆成两处：90MB 的大文件在 300m-patches，其余在 300m-patches-4。 */
+  const GITEE = S.gitee || {
+    enabled: true,
+    owner: "happy-every-day-in-the-book",
+    branch: "master",
+    repos: ["300m-patches", "300m-patches-2", "300m-patches-3", "300m-patches-4"],
+    // 分类 → 仓库索引（对应 GITEE.repos 的下标）
+    catRepo: {
+      "兴欣的君莫笑补丁": 0, "秋月的补丁": 0,
+      "LuCy的补丁": 1, "夜尔的补丁": 1, "小明的补丁": 1,
+      "ACNZ的补丁": 2, "Zn的补丁": 2, "mikufan的补丁": 2,
+      "鱼玖的补丁": 3
+    },
+    // 特例：这些文件（含 90MB 大包）实际在 0 号仓库
+    fileOverride: { "蔚蓝档案主题懒人包.zip": 0 }
+  };
+  // 由 GitHub 仓库路径推出对应的 Gitee raw 直链；无映射则返回空
+  function giteeUrlFor(p) {
+    if (!GITEE.enabled) return "";
+    let cat = p.category || "";
+    const fileName = fileNameOf(p.url || "");
+    let idx = (GITEE.fileOverride && GITEE.fileOverride[fileName] != null)
+      ? GITEE.fileOverride[fileName]
+      : GITEE.catRepo[cat];
+    if (idx == null || !GITEE.repos[idx]) return "";
+    // GitHub 路径形如 patches/分类/文件；Gitee 仓库里是 分类/文件（去掉 patches 前缀）
+    let rel = String(p.url || "");
+    const marker = "/main/";
+    const mi = rel.indexOf(marker);
+    if (mi >= 0) rel = rel.slice(mi + marker.length);
+    rel = rel.replace(/^[^/]+\//, ""); // 去掉最外层目录（patches/）
+    const enc = rel.split("/").map(encodeURIComponent).join("/");
+    return `https://raw.giteeusercontent.com/${GITEE.owner}/${GITEE.repos[idx]}/raw/${GITEE.branch}/${enc}`;
+  }
+  // 探测结果缓存：key=giteeUrl -> true(可用)/false(不可用)
+  const GITEE_PROBE_KEY = "patchdl_gitee_probe_v1";
+  let giteeProbe = {};
+  try { giteeProbe = JSON.parse(localStorage.getItem(GITEE_PROBE_KEY) || "{}"); } catch (e) { giteeProbe = {}; }
+  function saveGiteeProbe() { try { localStorage.setItem(GITEE_PROBE_KEY, JSON.stringify(giteeProbe)); } catch (e) {} }
+  // 快速探测 Gitee 直链是否可用（只取 1 字节；超时视为不可用）
+  function probeGitee(url) {
+    if (!url) return Promise.resolve(false);
+    if (giteeProbe[url] === true) return Promise.resolve(true);
+    if (giteeProbe[url] === false) return Promise.resolve(false);
+    return new Promise(resolve => {
+      const ctl = ("AbortController" in window) ? new AbortController() : null;
+      const timer = setTimeout(() => { if (ctl) ctl.abort(); resolve(false); }, 3500);
+      fetch(url, Object.assign({ method: "GET", headers: { Range: "bytes=0-0" }, cache: "no-store" }, ctl ? { signal: ctl.signal } : {}))
+        .then(r => { clearTimeout(timer); const ok = r.ok || r.status === 206; giteeProbe[url] = ok; saveGiteeProbe(); resolve(ok); })
+        .catch(() => { clearTimeout(timer); giteeProbe[url] = false; saveGiteeProbe(); resolve(false); });
+    });
+  }
+
   /* ---------- 下载次数统计（Abacus / Cloudflare）---------- */
   const COUNTER = S.counter || { enabled: false };
   const COUNT_CACHE_KEY = "patchdl_counts_v1";
@@ -524,11 +580,25 @@
           <span class="cell date">${p.date}</span>
           <span class="cell dl-count">${COUNTER.enabled ? `<b data-cnt-key="${escAttr(counterKey(p))}" class="cnt-val">${cachedCount(p)}</b> 次` : `—`}</span>
         </span>
-        <span class="dl"><a class="btn dl" href="${p.url}" download>下载</a></span>`;
+        <span class="dl"><a class="btn dl" href="${escAttr(p.url)}" download data-gitee="${escAttr(giteeUrlFor(p))}">下载</a></span>`;
       // 不主动发请求：次数只显示本机缓存，点「查看下载次数」或下载后才更新
-      // 点下载按钮时 +1（阻止冒泡，避免展开详情）
+      // 点下载：优先 Gitee（国内快），失败回退 GitHub；并 +1 计数
       const dlBtn = row.querySelector("a.btn.dl");
-      if (dlBtn) dlBtn.addEventListener("click", e => { e.stopPropagation(); hitCount(p); });
+      if (dlBtn) dlBtn.addEventListener("click", e => {
+        e.preventDefault(); e.stopPropagation();
+        hitCount(p);
+        const giteeUrl = dlBtn.getAttribute("data-gitee");
+        if (giteeUrl) {
+          dlBtn.textContent = "检测中…";
+          probeGitee(giteeUrl).then(ok => {
+            dlBtn.textContent = "下载";
+            if (ok) { window.location.href = giteeUrl; }
+            else { window.location.href = p.url; }
+          });
+        } else {
+          window.location.href = p.url;
+        }
+      });
       const detail = document.createElement("div");
       detail.className = "file-detail";
       detail.innerHTML = `<div class="t">更新内容</div><ul>${p.changes.map(c => `<li>${c}</li>`).join("")}</ul>`;
